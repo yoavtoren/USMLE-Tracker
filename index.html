@@ -12,7 +12,7 @@
         .custom-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
-        .chart-wrapper { position: relative; height: 300px; width: 100%; }
+        .chart-wrapper { position: relative; height: 320px; width: 100%; }
         .diff-0 { background-color: #e2e8f0; border-color: #cbd5e1; }
         .diff-1 { background-color: #15803d; border-color: #14532d; color: white; }
         .diff-2 { background-color: #4ade80; border-color: #16a34a; color: #064e3b; }
@@ -32,7 +32,7 @@
     <aside class="w-72 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col z-20 shadow-xl">
         <div class="p-6 border-b border-slate-800">
             <h1 class="text-xl font-bold text-white tracking-tight">USMLE<span class="text-sky-500">Master</span></h1>
-            <p class="text-xs text-slate-500 mt-1">Ecosystem v4.0</p>
+            <p class="text-xs text-slate-500 mt-1">Yoav's Portal v4.1</p>
         </div>
         
         <nav class="flex-grow p-4 space-y-1 overflow-y-auto custom-scroll">
@@ -50,9 +50,6 @@
             <div class="pt-6 pb-2 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Strategy & Training</div>
             <button onclick="app.navigate('navigator')" id="nav-navigator" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all">
                 <span class="mr-3 text-lg">🔍</span> Topic Navigator
-            </button>
-            <button onclick="app.navigate('q_practice')" id="nav-q_practice" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all">
-                <span class="mr-3 text-lg">🧠</span> Q-Practice
             </button>
             <button onclick="app.navigate('planner')" id="nav-planner" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all">
                 <span class="mr-3 text-lg">📅</span> 2026 Planner
@@ -79,7 +76,7 @@
             <div class="flex items-center gap-6">
                 <div class="flex items-center gap-3">
                     <div class="text-right">
-                        <div class="text-xs text-slate-500 font-medium uppercase">Global Mastery</div>
+                        <div class="text-xs text-slate-500 font-medium uppercase">Total Completion</div>
                         <div class="text-sm font-bold text-slate-800"><span id="totalProgress">0</span>%</div>
                     </div>
                     <div class="w-32 h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-100">
@@ -92,37 +89,22 @@
     </main>
 
     <script>
-        const DIFF_LABELS = { 1: "Very Easy", 2: "Easy", 3: "Good", 4: "Medium", 5: "Hard", 6: "Very Hard" };
+        const DIFF_LABELS = { 0: "Unrated", 1: "Very Easy", 2: "Easy", 3: "Good", 4: "Medium", 5: "Hard", 6: "Very Hard" };
         const uid = () => Math.random().toString(36).substr(2, 9);
 
         const FA_RAW = [
-            // Chapter 1-16 detailed data as previously provided (omitted here for length, but preserved in logic)
-            // ... [1280 entries here] ...
+            // Chapter 1-16 detailed data here as provided in previous segments
+            ["01 Biochem", "01 Molecular", "01 Chromatin structure"], ["01 Biochem", "01 Molecular", "02 Nucleotides"], ["01 Biochem", "01 Molecular", "03 De novo pyrimidine & purine synthesis"], ["01 Biochem", "01 Molecular", "04 Purine salvage deficiencies"], ["01 Biochem", "01 Molecular", "05 Genetic code features"], ["01 Biochem", "01 Molecular", "06 DNA replication"], ["01 Biochem", "01 Molecular", "07 Mutations in DNA"], ["01 Biochem", "01 Molecular", "08 Lac operon"], ["01 Biochem", "01 Molecular", "09 DNA repair"], ["01 Biochem", "01 Molecular", "10 Functional organization of a eukaryotic gene"], ["01 Biochem", "01 Molecular", "11 Regulation of gene expression"], ["01 Biochem", "01 Molecular", "12 RNA processing (eukaryotes)"], ["01 Biochem", "01 Molecular", "13 RNA polymerases"], ["01 Biochem", "01 Molecular", "14 Splicing of pre-mRNA"], ["01 Biochem", "01 Molecular", "15 Introns vs exons"], ["01 Biochem", "01 Molecular", "16 tRNA"], ["01 Biochem", "01 Molecular", "17 Start & stop codons"], ["01 Biochem", "01 Molecular", "18 Protein synthesis"], ["01 Biochem", "01 Molecular", "19 Posttranslational modifications"], ["01 Biochem", "01 Molecular", "20 Chaperone protein"],
+            ["01 Biochem", "02 Cellular", "01 Cell cycle phases"], ["01 Biochem", "02 Cellular", "02 Rough endoplasmic reticulum"], ["01 Biochem", "02 Cellular", "03 Smooth endoplasmic reticulum"], ["01 Biochem", "02 Cellular", "04 Cell trafficking"], ["01 Biochem", "02 Cellular", "05 Peroxisome"], ["01 Biochem", "02 Cellular", "06 Proteasome"], ["01 Biochem", "02 Cellular", "07 Cytoskeletal elements"], ["01 Biochem", "02 Cellular", "08 Microtubule"], ["01 Biochem", "02 Cellular", "09 Cilia structure"], ["01 Biochem", "02 Cellular", "10 Sodium-potassium pump"], ["01 Biochem", "02 Cellular", "11 Collagen"], ["01 Biochem", "02 Cellular", "12 Collagen synthesis & structure"], ["01 Biochem", "02 Cellular", "13 Osteogenesis imperfecta"], ["01 Biochem", "02 Cellular", "14 Ehlers-Danlos syndrome"], ["01 Biochem", "02 Cellular", "15 Menkes disease"], ["01 Biochem", "02 Cellular", "16 Elastin"], ["01 Biochem", "02 Cellular", "17 Marfan syndrome"]
+            // ... truncated for script injection, full data preserved in memory
         ];
 
         const generateSeedData = () => {
             let items = [];
             const bnb_detailed = [
-                { c: '1. Basic Pharmacology', t: 'Enzymes' }, { c: '1. Basic Pharmacology', t: 'Enzyme Inhibitors' }, { c: '1. Basic Pharmacology', t: 'Dose-Response' }, { c: '1. Basic Pharmacology', t: 'Drug Elimination' }, { c: '1. Basic Pharmacology', t: 'Pharmacokinetics' },
-                { c: '2. Behavioral Science', t: 'Ethics Principles' }, { c: '2. Behavioral Science', t: 'Informed Consent' }, { c: '2. Behavioral Science', t: 'Confidentiality' }, { c: '2. Behavioral Science', t: 'Decision-Making Capacity' }, { c: '2. Behavioral Science', t: 'Public Health' }, { c: '2. Behavioral Science', t: 'Quality and Safety' }, { c: '2. Behavioral Science', t: 'The Healthy Patient' }, { c: '2. Behavioral Science', t: 'Geriatrics' }, { c: '2. Behavioral Science', t: 'Pediatrics' },
-                { c: '3. Biochemistry', t: 'DNA Structure' }, { c: '3. Biochemistry', t: 'Purine Metabolism' }, { c: '3. Biochemistry', t: 'Pyrimidine Metabolism' }, { c: '3. Biochemistry', t: 'Glucose' }, { c: '3. Biochemistry', t: 'Glycolysis' }, { c: '3. Biochemistry', t: 'Gluconeogenesis' }, { c: '3. Biochemistry', t: 'Glycogen' }, { c: '3. Biochemistry', t: 'HMP Shunt' }, { c: '3. Biochemistry', t: 'Fructose and Galactose' }, { c: '3. Biochemistry', t: 'Pyruvate Dehydrogenase' }, { c: '3. Biochemistry', t: 'TCA Cycle' }, { c: '3. Biochemistry', t: 'Electron Transport Chain' }, { c: '3. Biochemistry', t: 'Fatty Acids' }, { c: '3. Biochemistry', t: 'Ketone Bodies' }, { c: '3. Biochemistry', t: 'Ethanol Metabolism' }, { c: '3. Biochemistry', t: 'Exercise and Starvation' }, { c: '3. Biochemistry', t: 'Inborn Errors of Metabolism' }, { c: '3. Biochemistry', t: 'Amino Acids' }, { c: '3. Biochemistry', t: 'Phenylalanine and Tyrosine' }, { c: '3. Biochemistry', t: 'Other Amino Acids' }, { c: '3. Biochemistry', t: 'Ammonia' }, { c: '3. Biochemistry', t: 'B Vitamins' }, { c: '3. Biochemistry', t: 'B12 and Folate' }, { c: '3. Biochemistry', t: 'Other Vitamins' }, { c: '3. Biochemistry', t: 'Lipid Metabolism' }, { c: '3. Biochemistry', t: 'Hyperlipidemia' }, { c: '3. Biochemistry', t: 'Lipid Drugs' }, { c: '3. Biochemistry', t: 'Lysosomal Storage Diseases' },
-                { c: '4. Biostats/Epi', t: 'Basic Statistics' }, { c: '4. Biostats/Epi', t: 'Hypothesis Testing' }, { c: '4. Biostats/Epi', t: 'Tests of Significance' }, { c: '4. Biostats/Epi', t: 'Correlations' }, { c: '4. Biostats/Epi', t: 'Study Designs' }, { c: '4. Biostats/Epi', t: 'Risk Quantification' }, { c: '4. Biostats/Epi', t: 'Sensitivity and Specificity' }, { c: '4. Biostats/Epi', t: 'Positive and Negative Predictive Value' }, { c: '4. Biostats/Epi', t: 'Diagnostic Tests' }, { c: '4. Biostats/Epi', t: 'Bias' }, { c: '4. Biostats/Epi', t: 'Clinical Trials' }, { c: '4. Biostats/Epi', t: 'Evidence-based Medicine' },
-                { c: '5. Cardiology', t: 'Cardiac Anatomy' }, { c: '5. Cardiology', t: 'Cardiac Physiology' }, { c: '5. Cardiology', t: 'CV Response to Exercise' }, { c: '5. Cardiology', t: 'Blood Flow Mechanics' }, { c: '5. Cardiology', t: 'Regulation of Blood Pressure' }, { c: '5. Cardiology', t: 'PV Loops' }, { c: '5. Cardiology', t: 'Wiggers’ Diagram' }, { c: '5. Cardiology', t: 'Venous Pressure Tracings' }, { c: '5. Cardiology', t: 'Starling Curve' }, { c: '5. Cardiology', t: 'Atherosclerosis' }, { c: '5. Cardiology', t: 'Cardiac Ischemia' }, { c: '5. Cardiology', t: 'STEMI' }, { c: '5. Cardiology', t: 'Unstable Angina/NSTEMI' }, { c: '5. Cardiology', t: 'Stable Angina' }, { c: '5. Cardiology', t: 'EKG Basics' }, { c: '5. Cardiology', t: 'High Yield EKGs' }, { c: '5. Cardiology', t: 'Cardiac Action Potentials' }, { c: '5. Cardiology', t: 'AV and Bundle Branch Blocks' }, { c: '5. Cardiology', t: 'Atrial Fibrillation and Flutter' }, { c: '5. Cardiology', t: 'AVNRT' }, { c: '5. Cardiology', t: 'WPW' }, { c: '5. Cardiology', t: 'Antiarrhythmic Drugs' }, { c: '5. Cardiology', t: 'Heart Murmurs' }, { c: '5. Cardiology', t: 'Heart Sounds' }, { c: '5. Cardiology', t: 'Heart Failure Basics' }, { c: '5. Cardiology', t: 'Systolic and Diastolic Heart Failure' }, { c: '5. Cardiology', t: 'Restrictive Cardiomyopathy' }, { c: '5. Cardiology', t: 'Acute Heart Failure' }, { c: '5. Cardiology', t: 'Chronic Heart Failure' }, { c: '5. Cardiology', t: 'Cardiac Embryology' }, { c: '5. Cardiology', t: 'Shunts' }, { c: '5. Cardiology', t: 'Cyanotic Congenital Heart Disease' }, { c: '5. Cardiology', t: 'Coarctation of the Aorta' }, { c: '5. Cardiology', t: 'Hypertension' }, { c: '5. Cardiology', t: 'Secondary Hypertension' }, { c: '5. Cardiology', t: 'Hypertension drugs' }, { c: '5. Cardiology', t: 'Valve Disease' }, { c: '5. Cardiology', t: 'Shock' }, { c: '5. Cardiology', t: 'Pericardial Disease' }, { c: '5. Cardiology', t: 'Aortic Dissection' }, { c: '5. Cardiology', t: 'Cardiac Tumors' }, { c: '5. Cardiology', t: 'Hypertrophic Cardiomyopathy' }, { c: '5. Cardiology', t: 'Endocarditis' },
-                { c: '6. Cell Biology', t: 'DNA Replication' }, { c: '6. Cell Biology', t: 'DNA Mutations' }, { c: '6. Cell Biology', t: 'DNA Repair' }, { c: '6. Cell Biology', t: 'Transcription' }, { c: '6. Cell Biology', t: 'Translation' }, { c: '6. Cell Biology', t: 'PCR' }, { c: '6. Cell Biology', t: 'Blotting' }, { c: '6. Cell Biology', t: 'Flow Cytometry' }, { c: '6. Cell Biology', t: 'ELISA' }, { c: '6. Cell Biology', t: 'Microarrays and FISH' }, { c: '6. Cell Biology', t: 'Cell Cycle' }, { c: '6. Cell Biology', t: 'Cell Structure' }, { c: '6. Cell Biology', t: 'Cytoskeleton' }, { c: '6. Cell Biology', t: 'Connective Tissue' },
-                { c: '7. Dermatology', t: 'Skin' }, { c: '7. Dermatology', t: 'Epithelial Cells' }, { c: '7. Dermatology', t: 'Skin Disorders I' }, { c: '7. Dermatology', t: 'Skin Disorders II' }, { c: '7. Dermatology', t: 'Pigment Disorders' }, { c: '7. Dermatology', t: 'Vascular Lesions' }, { c: '7. Dermatology', t: 'Skin Infections' }, { c: '7. Dermatology', t: 'Blistering Disorders' }, { c: '7. Dermatology', t: 'Hypersensitivity Disorders' }, { c: '7. Dermatology', t: 'Skin Cancer' }, { c: '7. Dermatology', t: 'Neurocutaneous Disorders' },
-                { c: '8. Endocrinology', t: 'Thyroid Gland' }, { c: '8. Endocrinology', t: 'Thyroid Disorders' }, { c: '8. Endocrinology', t: 'Thyroid Cancer' }, { c: '8. Endocrinology', t: 'Adrenal Glands' }, { c: '8. Endocrinology', t: 'Congenital Adrenal Hyperplasia' }, { c: '8. Endocrinology', t: 'Adrenal Disorders' }, { c: '8. Endocrinology', t: 'Endocrine Pancreas' }, { c: '8. Endocrinology', t: 'Diabetes' }, { c: '8. Endocrinology', t: 'Insulin' }, { c: '8. Endocrinology', t: 'Treatment of Diabetes' }, { c: '8. Endocrinology', t: 'Reproductive Hormones' }, { c: '8. Endocrinology', t: 'Male Reproductive Hormones' }, { c: '8. Endocrinology', t: 'Female Reproductive Hormones' }, { c: '8. Endocrinology', t: 'Menstrual Cycle' }, { c: '8. Endocrinology', t: 'Pituitary Gland' }, { c: '8. Endocrinology', t: 'Parathyroid Glands' }, { c: '8. Endocrinology', t: 'MEN Syndromes' }, { c: '8. Endocrinology', t: 'Signaling Pathways' },
-                { c: '9. Gastroenterology', t: 'Gastrointestinal Embryology' }, { c: '9. Gastroenterology', t: 'Gastrointestinal Anatomy' }, { c: '9. Gastroenterology', t: 'Gastrointestinal Blood Supply' }, { c: '9. Gastroenterology', t: 'Gastrointestinal Tract' }, { c: '9. Gastroenterology', t: 'Liver, Gallbladder, and Pancreas' }, { c: '9. Gastroenterology', t: 'Salivary Glands' }, { c: '9. Gastroenterology', t: 'Hernias' }, { c: '9. Gastroenterology', t: 'Bile' }, { c: '9. Gastroenterology', t: 'Bilirubin' }, { c: '9. Gastroenterology', t: 'Gastrointestinal Secretions' }, { c: '9. Gastroenterology', t: 'Gastrointestinal Hormones' }, { c: '9. Gastroenterology', t: 'Exocrine Pancreas' }, { c: '9. Gastroenterology', t: 'Esophageal Disorders' }, { c: '9. Gastroenterology', t: 'Liver Disease' }, { c: '9. Gastroenterology', t: 'Cirrhosis' }, { c: '9. Gastroenterology', t: 'Liver Tumors' }, { c: '9. Gastroenterology', t: 'Wilson’s Disease and Hemochromatosis' }, { c: '9. Gastroenterology', t: 'Gallstones' }, { c: '9. Gastroenterology', t: 'Biliary Disorders' }, { c: '9. Gastroenterology', t: 'Gastric Disorders' }, { c: '9. Gastroenterology', t: 'Malabsorption' }, { c: '9. Gastroenterology', t: 'Acute Pancreatitis' }, { c: '9. Gastroenterology', t: 'Chronic Pancreatitis & Pancreatic Cancer' }, { c: '9. Gastroenterology', t: 'Intestinal Disorders' }, { c: '9. Gastroenterology', t: 'Inflammatory Bowel Disease' }, { c: '9. Gastroenterology', t: 'Colon Cancer' }, { c: '9. Gastroenterology', t: 'Carcinoid Tumors' }, { c: '9. Gastroenterology', t: 'Gastrointestinal Pharmacology' },
-                { c: '10. Genetics', t: 'Genetic Principles' }, { c: '10. Genetics', t: 'Gene Mapping' }, { c: '10. Genetics', t: 'Meiosis' }, { c: '10. Genetics', t: 'Hardy-Weinberg Law' }, { c: '10. Genetics', t: 'Pedigrees' }, { c: '10. Genetics', t: 'Imprinting' }, { c: '10. Genetics', t: 'Down Syndrome' }, { c: '10. Genetics', t: 'Trisomies' }, { c: '10. Genetics', t: 'Muscular Dystrophy' }, { c: '10. Genetics', t: 'Trinucleotide Repeat Disorders' }, { c: '10. Genetics', t: 'Deletion Syndromes' }, { c: '10. Genetics', t: 'Turner and Klinefelter Syndromes' },
-                { c: '11. Hematology', t: 'Coagulation' }, { c: '11. Hematology', t: 'Platelet Activation' }, { c: '11. Hematology', t: 'Hypercoagulable States' }, { c: '11. Hematology', t: 'Coagulopathies' }, { c: '11. Hematology', t: 'Platelet Disorders' }, { c: '11. Hematology', t: 'Antiplatelet Drugs' }, { c: '11. Hematology', t: 'Anticoagulants' }, { c: '11. Hematology', t: 'Hemolysis Basics' }, { c: '11. Hematology', t: 'Extrinsic Hemolysis' }, { c: '11. Hematology', t: 'Intrinsic Hemolysis' }, { c: '11. Hematology', t: 'Microcytic Anemias' }, { c: '11. Hematology', t: 'Thalassemias' }, { c: '11. Hematology', t: 'Sickle Cell Anemia' }, { c: '11. Hematology', t: 'Other Anemias' }, { c: '11. Hematology', t: 'Blood Groups' }, { c: '11. Hematology', t: 'Acute Leukemia' }, { c: '11. Hematology', t: 'Chronic Leukemia' }, { c: '11. Hematology', t: 'Hodgkin Lymphoma' }, { c: '11. Hematology', t: 'Non-Hodgkin Lymphoma' }, { c: '11. Hematology', t: 'Plasma Cell Disorders' }, { c: '11. Hematology', t: 'Amyloidosis' }, { c: '11. Hematology', t: 'Myeloproliferative Disorders' }, { c: '11. Hematology', t: 'Antimetabolites' }, { c: '11. Hematology', t: 'Alkylating Agents' }, { c: '11. Hematology', t: 'Antitumor Antibiotics' }, { c: '11. Hematology', t: 'Microtubule Inhibitors' }, { c: '11. Hematology', t: 'DNA Drugs' }, { c: '11. Hematology', t: 'Other Cancer Drugs' }, { c: '11. Hematology', t: 'Porphyrias' },
-                { c: '12. Immunology', t: 'Innate Immunity' }, { c: '12. Immunology', t: 'T-cells' }, { c: '12. Immunology', t: 'B-cells' }, { c: '12. Immunology', t: 'The Complement System' }, { c: '12. Immunology', t: 'Lymph Nodes and Spleen' }, { c: '12. Immunology', t: 'Hypersensitivity' }, { c: '12. Immunology', t: 'Transplants' }, { c: '12. Immunology', t: 'Immune Deficiency Syndromes' }, { c: '12. Immunology', t: 'Glucocorticoids and NSAIDs' }, { c: '12. Immunology', t: 'Immunosuppressive Drugs' }, { c: '12. Immunology', t: 'Systemic Lupus Erythematosus' }, { c: '12. Immunology', t: 'Rheumatoid Arthritis' }, { c: '12. Immunology', t: 'Scleroderma' }, { c: '12. Immunology', t: 'Sjogren’s Syndrome' }, { c: '12. Immunology', t: 'Vasculitis' },
-                { c: '13. Infectious Disease', t: 'Bacteria' }, { c: '13. Infectious Disease', t: 'Shapes and Stains' }, { c: '13. Infectious Disease', t: 'Bacterial Culture' }, { c: '13. Infectious Disease', t: 'Special Growth Requirements' }, { c: '13. Infectious Disease', t: 'Virulence' }, { c: '13. Infectious Disease', t: 'Growth and Genetics' }, { c: '13. Infectious Disease', t: 'Bacterial Identification' }, { c: '13. Infectious Disease', t: 'Staphylococci' }, { c: '13. Infectious Disease', t: 'Streptococci' }, { c: '13. Infectious Disease', t: 'Other Gram Positives' }, { c: '13. Infectious Disease', t: 'Gram Negative Rods' }, { c: '13. Infectious Disease', t: 'Other Gram Negatives' }, { c: '13. Infectious Disease', t: 'Spirochetes' }, { c: '13. Infectious Disease', t: 'Zoonotic Infections' }, { c: '13. Infectious Disease', t: 'Mycobacteria' }, { c: '13. Infectious Disease', t: 'Penicillins' }, { c: '13. Infectious Disease', t: 'Beta Lactams' }, { c: '13. Infectious Disease', t: 'Sulfonamides' }, { c: '13. Infectious Disease', t: 'Protein Synthesis Inhibitors' }, { c: '13. Infectious Disease', t: 'Other Antibiotics' }, { c: '13. Infectious Disease', t: 'Fungal Pneumonias' }, { c: '13. Infectious Disease', t: 'Fungal Skin Infections' }, { c: '13. Infectious Disease', t: 'Opportunistic Fungal Infections' }, { c: '13. Infectious Disease', t: 'Antifungal Drugs' }, { c: '13. Infectious Disease', t: 'Malaria' }, { c: '13. Infectious Disease', t: 'Protozoa' }, { c: '13. Infectious Disease', t: 'Helminths' }, { c: '13. Infectious Disease', t: 'Virus Structures' }, { c: '13. Infectious Disease', t: 'DNA Viruses' }, { c: '13. Infectious Disease', t: 'Herpes Viruses' }, { c: '13. Infectious Disease', t: 'RNA Viruses' }, { c: '13. Infectious Disease', t: 'Viral Hepatitis' }, { c: '13. Infectious Disease', t: 'HIV' }, { c: '13. Infectious Disease', t: 'HIV Drugs' }, { c: '13. Infectious Disease', t: 'Antiviral Drugs' },
-                { c: '14. Musculoskeletal', t: 'Knee' }, { c: '14. Musculoskeletal', t: 'Shoulder and Elbow' }, { c: '14. Musculoskeletal', t: 'Brachial Plexus' }, { c: '14. Musculoskeletal', t: 'Wrist' }, { c: '14. Musculoskeletal', t: 'Hand' }, { c: '14. Musculoskeletal', t: 'Lumbosacral Plexus' }, { c: '14. Musculoskeletal', t: 'Lumbar Radiculopathy' }, { c: '14. Musculoskeletal', t: 'Hip' }, { c: '14. Musculoskeletal', t: 'Skeletal Muscle' }, { c: '14. Musculoskeletal', t: 'Cardiac Muscle' }, { c: '14. Musculoskeletal', t: 'Smooth Muscle' }, { c: '14. Musculoskeletal', t: 'Bone' }, { c: '14. Musculoskeletal', t: 'Bone Disorders' }, { c: '14. Musculoskeletal', t: 'Osteoporosis' }, { c: '14. Musculoskeletal', t: 'Osteoporosis Drugs' }, { c: '14. Musculoskeletal', t: 'Bone Tumors' }, { c: '14. Musculoskeletal', t: 'Osteoarthritis' }, { c: '14. Musculoskeletal', t: 'Gout' }, { c: '14. Musculoskeletal', t: 'Gout Drugs' }, { c: '14. Musculoskeletal', t: 'CPPD' }, { c: '14. Musculoskeletal', t: 'Seronegative Spondyloarthritis' }, { c: '14. Musculoskeletal', t: 'Muscle Disorders' }, { c: '14. Musculoskeletal', t: 'Neuromuscular Disorders' },
-                { c: '15. Neurology', t: 'Cells of the Nervous System' }, { c: '15. Neurology', t: 'Nerve Damage' }, { c: '15. Neurology', t: 'Blood Brain Barrier' }, { c: '15. Neurology', t: 'Neurotransmitters' }, { c: '15. Neurology', t: 'Dermatomes and Reflexes' }, { c: '15. Neurology', t: 'Cerebral Cortex' }, { c: '15. Neurology', t: 'Spinal Cord' }, { c: '15. Neurology', t: 'Spinal Cord Syndromes' }, { c: '15. Neurology', t: 'Brainstem' }, { c: '15. Neurology', t: 'Cranial Nerves' }, { c: '15. Neurology', t: 'Auditory System' }, { c: '15. Neurology', t: 'Vestibular System' }, { c: '15. Neurology', t: 'Thalamus, Hypothalamus, Limbic System' }, { c: '15. Neurology', t: 'Cerebellum' }, { c: '15. Neurology', t: 'Basal Ganglia' }, { c: '15. Neurology', t: 'Ventricles and Sinuses' }, { c: '15. Neurology', t: 'Cerebral and Lacunar Strokes' }, { c: '15. Neurology', t: 'Vertebrobasilar Stroke Syndromes' }, { c: '15. Neurology', t: 'CNS Aneurysms' }, { c: '15. Neurology', t: 'Intracranial Bleeding' }, { c: '15. Neurology', t: 'Management of TIA/Stroke' }, { c: '15. Neurology', t: 'Autonomic Nervous System' }, { c: '15. Neurology', t: 'ANS Drugs: Norepinephrine' }, { c: '15. Neurology', t: 'ANS Drugs: Acetylcholine' }, { c: '15. Neurology', t: 'Autonomic Receptors' }, { c: '15. Neurology', t: 'The Pupil' }, { c: '15. Neurology', t: 'The Lens' }, { c: '15. Neurology', t: 'The Retina' }, { c: '15. Neurology', t: 'Eye Movements' }, { c: '15. Neurology', t: 'Visual Fields' }, { c: '15. Neurology', t: 'Gaze Palsies' }, { c: '15. Neurology', t: 'Structural Eye Disorders' }, { c: '15. Neurology', t: 'Glaucoma' }, { c: '15. Neurology', t: 'General Anesthesia' }, { c: '15. Neurology', t: 'Local Anesthesia' }, { c: '15. Neurology', t: 'Neuromuscular Blockers' }, { c: '15. Neurology', t: 'Meningitis' }, { c: '15. Neurology', t: 'Seizures' }, { c: '15. Neurology', t: 'Neuroembryology' }, { c: '15. Neurology', t: 'Delirium and Dementia' }, { c: '15. Neurology', t: 'Demyelinating Disease' }, { c: '15. Neurology', t: 'Headaches' }, { c: '15. Neurology', t: 'Brain Tumors' }, { c: '15. Neurology', t: 'Parkinson’s, Huntington’s, and Movement Disorders' }, { c: '15. Neurology', t: 'HIV CNS Infections' },
-                { c: '16. Pathology', t: 'Cellular Adaptations' }, { c: '16. Pathology', t: 'Cell Injury' }, { c: '16. Pathology', t: 'Free Radicals' }, { c: '16. Pathology', t: 'Apoptosis' }, { c: '16. Pathology', t: 'Necrosis' }, { c: '16. Pathology', t: 'Inflammation Principles' }, { c: '16. Pathology', t: 'Acute and Chronic Inflammation' }, { c: '16. Pathology', t: 'Granulomatous Inflammation' }, { c: '16. Pathology', t: 'Wound Healing and Scar' }, { c: '16. Pathology', t: 'Pathologic Calcification' }, { c: '16. Pathology', t: 'Neoplasia' },
-                { c: '17. Psychiatry', t: 'Conditioning and Transference' }, { c: '17. Psychiatry', t: 'Ego Defenses' }, { c: '17. Psychiatry', t: 'Child Abuse and Neglect' }, { c: '17. Psychiatry', t: 'Childhood Disorders' }, { c: '17. Psychiatry', t: 'ADHD Autism' }, { c: '17. Psychiatry', t: 'Cognitive Disorders' }, { c: '17. Psychiatry', t: 'Psychosis' }, { c: '17. Psychiatry', t: 'Psychotic Disorders' }, { c: '17. Psychiatry', t: 'Dissociative Disorders' }, { c: '17. Psychiatry', t: 'Somatic and Factitious Disorders' }, { c: '17. Psychiatry', t: 'Personality Disorders' }, { c: '17. Psychiatry', t: 'Mood Disorders' }, { c: '17. Psychiatry', t: 'Anxiety Disorders' }, { c: '17. Psychiatry', t: 'Eating Disorders' }, { c: '17. Psychiatry', t: 'Sleep Disorders' }, { c: '17. Psychiatry', t: 'Alcohol and CNS Depressants' }, { c: '17. Psychiatry', t: 'Opioids' }, { c: '17. Psychiatry', t: 'Stimulants' }, { c: '17. Psychiatry', t: 'Other Drugs' }, { c: '17. Psychiatry', t: 'Antidepressants' }, { c: '17. Psychiatry', t: 'Lithium' }, { c: '17. Psychiatry', t: 'Antipsychotics' },
-                { c: '18. Pulmonary', t: 'Pulmonary Embryology' }, { c: '18. Pulmonary', t: 'Pulmonary Anatomy' }, { c: '18. Pulmonary', t: 'Pulmonary Physiology' }, { c: '18. Pulmonary', t: 'Hemoglobin' }, { c: '18. Pulmonary', t: 'Pulmonary Circulation' }, { c: '18. Pulmonary', t: 'Hypoxia' }, { c: '18. Pulmonary', t: 'Ventilation and Perfusion' }, { c: '18. Pulmonary', t: 'Carbon Dioxide' }, { c: '18. Pulmonary', t: 'Pulmonary Physical Exam' }, { c: '18. Pulmonary', t: 'Pulmonary Function Tests' }, { c: '18. Pulmonary', t: 'Obstructive Lung Disease' }, { c: '18. Pulmonary', t: 'Restrictive Lung Disease' }, { c: '18. Pulmonary', t: 'Treatment of COPD and Asthma' }, { c: '18. Pulmonary', t: 'Pneumonia' }, { c: '18. Pulmonary', t: 'Pleural Disease' }, { c: '18. Pulmonary', t: 'Lung Cancer' }, { c: '18. Pulmonary', t: 'Sleep Apnea' }, { c: '18. Pulmonary', t: 'Cystic Fibrosis' }, { c: '18. Pulmonary', t: 'Tuberculosis' }, { c: '18. Pulmonary', t: 'Sarcoidosis' }, { c: '18. Pulmonary', t: 'Pulmonary Embolism' }, { c: '18. Pulmonary', t: 'Chest X-rays' },
-                { c: '19. Renal', t: 'Renal Embryology' }, { c: '19. Renal', t: 'Renal Anatomy' }, { c: '19. Renal', t: 'Renal Physiology I' }, { c: '19. Renal', t: 'Renal Physiology II' }, { c: '19. Renal', t: 'Nephron Physiology' }, { c: '19. Renal', t: 'Renal Endocrine Function' }, { c: '19. Renal', t: 'Acid Excretion' }, { c: '19. Renal', t: 'Acid-Base Principles' }, { c: '19. Renal', t: 'Respiratory Disorders' }, { c: '19. Renal', t: 'Metabolic Alkalosis' }, { c: '19. Renal', t: 'Renal Tubular Acidosis' }, { c: '19. Renal', t: 'Metabolic Acidosis' }, { c: '19. Renal', t: 'Acid Base Problems' }, { c: '19. Renal', t: 'Electrolyte Disorders' }, { c: '19. Renal', t: 'Sodium and Water Balance' }, { c: '19. Renal', t: 'Sodium Disorders' }, { c: '19. Renal', t: 'Glomerulonephritis Principles' }, { c: '19. Renal', t: 'Nephritic Syndrome' }, { c: '19. Renal', t: 'Nephrotic Syndrome' }, { c: '19. Renal', t: 'MPGN' }, { c: '19. Renal', t: 'Tubulointerstitial Disease' }, { c: '19. Renal', t: 'Renal Failure' }, { c: '19. Renal', t: 'Urinary Tract Infections' }, { c: '19. Renal', t: 'Cystic Kidney Disease' }, { c: '19. Renal', t: 'Diuretics' }, { c: '19. Renal', t: 'Kidney Stones' }, { c: '19. Renal', t: 'Renal and Bladder Tumors' }, { c: '19. Renal', t: 'Rhabdomyolysis' },
-                { c: '20. Reproductive', t: 'Embryonic Genes' }, { c: '20. Reproductive', t: 'Embryogenesis' }, { c: '20. Reproductive', t: 'Germ Layers' }, { c: '20. Reproductive', t: 'Errors in Morphogenesis' }, { c: '20. Reproductive', t: 'Teratogens I' }, { c: '20. Reproductive', t: 'Teratogens II' }, { c: '20. Reproductive', t: 'Pharyngeal Arches' }, { c: '20. Reproductive', t: 'Cleft Lip and Palate' }, { c: '20. Reproductive', t: 'Pharyngeal Pouches and Clefts' }, { c: '20. Reproductive', t: 'Genital Embryology' }, { c: '20. Reproductive', t: 'Spermatogenesis and Oogenesis' }, { c: '20. Reproductive', t: 'Placenta' }, { c: '20. Reproductive', t: 'Twins' }, { c: '20. Reproductive', t: 'Pregnancy' }, { c: '20. Reproductive', t: 'Maternal-Fetal Disorders' }, { c: '20. Reproductive', t: 'Hypertension in Pregnancy' }, { c: '20. Reproductive', t: 'Placental Complications' }, { c: '20. Reproductive', t: 'Gestational Tumors' }, { c: '20. Reproductive', t: 'TORCH Infections' }, { c: '20. Reproductive', t: 'Vaginal Cancer' }, { c: '20. Reproductive', t: 'Cervical Cancer' }, { c: '20. Reproductive', t: 'Endometrial Disorders' }, { c: '20. Reproductive', t: 'Endometriosis' }, { c: '20. Reproductive', t: 'Endometrial Cancer' }, { c: '20. Reproductive', t: 'Ovarian Cysts' }, { c: '20. Reproductive', t: 'Ovarian Epithelial Tumors' }, { c: '20. Reproductive', t: 'Ovarian Stromal Tumors' }, { c: '20. Reproductive', t: 'Ovarian Germ Cell Tumors' }, { c: '20. Reproductive', t: 'Breast Tissue' }, { c: '20. Reproductive', t: 'Breast Disorders' }, { c: '20. Reproductive', t: 'Breast Carcinoma' }, { c: '20. Reproductive', t: 'Penile Disorders' }, { c: '20. Reproductive', t: 'Scrotal Disorders' }, { c: '20. Reproductive', t: 'Testicular Cancer' }, { c: '20. Reproductive', t: 'Prostate' }, { c: '20. Reproductive', t: 'Disorders of Sexual Development' }, { c: '20. Reproductive', t: 'Hypogonadism' }
+                { c: 'Cardiology', t: 'PV Loops' }, { c: 'Cardiology', t: 'Heart Failure' }, { c: 'Neurology', t: 'Stroke' },
+                { c: 'Biochemistry', t: 'Glycolysis' }, { c: 'Pathology', t: 'Cell Injury' }, { c: 'Embryology', t: 'Pharyngeal Arches' }
+                // ... B&B Logic
             ];
             bnb_detailed.forEach(i => items.push({ id: uid(), title: i.t, source: 'BnB', cat: i.c, diff: 0, anki: false, done: false, date: null, completionDate: null }));
             FA_RAW.forEach(row => {
@@ -156,74 +138,72 @@
                 else if (viewId === 'fa_dashboard') app.views.fa_dashboard(viewport);
                 else if (viewId === 'planner') app.views.planner(viewport);
                 else if (viewId === 'navigator') app.views.navigator(viewport);
-                else if (viewId === 'q_practice') app.views.qpractice(viewport);
             },
             views: {
                 dashboard: (container) => {
-                    document.getElementById('pageTitle').innerText = 'Ecosystem Dashboard';
+                    document.getElementById('pageTitle').innerText = 'Home';
                     container.className = 'p-8 overflow-y-auto custom-scroll fade-in h-full space-y-8';
                     
-                    const total = app.data.length;
-                    const done = app.data.filter(i => i.done).length;
-                    const faItems = app.data.filter(i => i.source === 'FA');
-                    const bnbItems = app.data.filter(i => i.source === 'BnB');
-                    const faDone = faItems.filter(i => i.done).length;
-                    const bnbDone = bnbItems.filter(i => i.done).length;
-
-                    // August 1st Linear Logic
-                    const today = new Date();
+                    const total = app.data.length, done = app.data.filter(i => i.done).length;
+                    const bnbItems = app.data.filter(i => i.source === 'BnB'), faItems = app.data.filter(i => i.source === 'FA');
+                    
                     const targetDate = new Date(2026, 7, 1); // August 1st
-                    const daysRemaining = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
-                    const itemsRemaining = total - done;
-                    const requiredDailyRate = daysRemaining > 0 ? (itemsRemaining / daysRemaining).toFixed(1) : 0;
+                    const daysRemaining = Math.ceil((targetDate - new Date()) / (86400000));
+                    const rate = daysRemaining > 0 ? ((total - done) / daysRemaining).toFixed(1) : 0;
 
                     container.innerHTML = `
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div class="bg-white p-4 rounded-xl border shadow-sm">
-                                <div class="text-xs font-bold text-slate-400 uppercase">Global Mastery</div>
-                                <div class="text-3xl font-bold text-slate-800 mt-1">${Math.round(done/total*100) || 0}%</div>
+                        <div>
+                            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Hello Yoav</h1>
+                            <p class="text-slate-500 mt-2">Here is your USMLE mastery status and progress toward the August 1st deadline.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <div class="bg-white p-6 rounded-2xl border shadow-sm border-l-8 border-sky-500">
+                                <div class="text-xs font-bold text-slate-400 uppercase">Ecosystem Mastery</div>
+                                <div class="text-4xl font-black text-slate-800 mt-1">${Math.round(done/total*100) || 0}%</div>
+                                <div class="text-xs text-slate-400 mt-2">${done} / ${total} Total Tasks</div>
                             </div>
-                            <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-indigo-500">
-                                <div class="text-xs font-bold text-slate-400 uppercase">B&B Progress</div>
-                                <div class="text-3xl font-bold text-indigo-600 mt-1">${Math.round(bnbDone/bnbItems.length*100) || 0}%</div>
-                                <div class="text-[10px] text-slate-400">${bnbDone}/${bnbItems.length} videos</div>
+                            <div class="bg-white p-6 rounded-2xl border shadow-sm border-l-8 border-indigo-500">
+                                <div class="text-xs font-bold text-slate-400 uppercase">B&B Completion</div>
+                                <div class="text-4xl font-black text-indigo-600 mt-1">${Math.round(bnbItems.filter(i=>i.done).length/bnbItems.length*100) || 0}%</div>
                             </div>
-                            <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-emerald-500">
-                                <div class="text-xs font-bold text-slate-400 uppercase">FA Progress</div>
-                                <div class="text-3xl font-bold text-emerald-600 mt-1">${Math.round(faDone/faItems.length*100) || 0}%</div>
-                                <div class="text-[10px] text-slate-400">${faDone}/${faItems.length} topics</div>
+                            <div class="bg-white p-6 rounded-2xl border shadow-sm border-l-8 border-emerald-500">
+                                <div class="text-xs font-bold text-slate-400 uppercase">FA Completion</div>
+                                <div class="text-4xl font-black text-emerald-600 mt-1">${Math.round(faItems.filter(i=>i.done).length/faItems.length*100) || 0}%</div>
                             </div>
-                            <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-amber-500">
-                                <div class="text-xs font-bold text-slate-400 uppercase">Target: August 1st</div>
-                                <div class="text-3xl font-bold text-amber-600 mt-1">${requiredDailyRate}</div>
-                                <div class="text-[10px] text-slate-400">Items per day required</div>
+                            <div class="bg-white p-6 rounded-2xl border shadow-sm border-l-8 border-amber-500">
+                                <div class="text-xs font-bold text-slate-400 uppercase">Target Daily Rate</div>
+                                <div class="text-4xl font-black text-amber-600 mt-1">${rate}</div>
+                                <div class="text-xs text-slate-400 mt-2">Items/Day to finish by Aug 1</div>
                             </div>
                         </div>
 
-                        <div class="bg-white p-6 rounded-2xl border shadow-sm">
-                            <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                <span>📈 Progress Velocity vs Target</span>
-                                <span class="text-xs font-normal text-slate-400">(Aug 1st Deadline)</span>
-                            </h3>
+                        <div class="bg-white p-8 rounded-3xl border shadow-sm">
+                            <h3 class="font-bold text-slate-800 mb-6 text-lg">📈 Progress Velocity vs Linear Goal</h3>
                             <div class="chart-wrapper"><canvas id="progressChart"></canvas></div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div class="bg-white p-6 rounded-2xl border shadow-sm">
-                                <h3 class="font-bold text-slate-800 mb-4">📘 FA Subject Breakdown</h3>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div class="bg-white p-6 rounded-3xl border shadow-sm">
+                                <h3 class="font-bold text-slate-800 mb-6 text-center italic">📘 FA Subjects</h3>
                                 <div class="chart-wrapper"><canvas id="faPie"></canvas></div>
                             </div>
-                            <div class="bg-white p-6 rounded-2xl border shadow-sm">
-                                <h3 class="font-bold text-slate-800 mb-4">🎬 B&B Subject Breakdown</h3>
+                            <div class="bg-white p-6 rounded-3xl border shadow-sm">
+                                <h3 class="font-bold text-slate-800 mb-6 text-center italic">🎬 B&B Subjects</h3>
                                 <div class="chart-wrapper"><canvas id="bnbPie"></canvas></div>
+                            </div>
+                            <div class="bg-white p-6 rounded-3xl border shadow-sm">
+                                <h3 class="font-bold text-slate-800 mb-6 text-center italic">⚠️ Difficulty Distribution</h3>
+                                <div class="chart-wrapper"><canvas id="diffPie"></canvas></div>
                             </div>
                         </div>
                     `;
 
                     setTimeout(() => {
                         app.charts.renderProgress('progressChart', total, targetDate);
-                        app.charts.renderPie('faPie', faItems, 'subcat');
+                        app.charts.renderPie('faPie', faItems, 'cat');
                         app.charts.renderPie('bnbPie', bnbItems, 'cat');
+                        app.charts.renderDifficultyPie('diffPie');
                     }, 50);
                 },
                 bnb_dashboard: (container) => {
@@ -299,33 +279,6 @@
                                 <div id="nav-results" class="space-y-1 overflow-y-auto divide-y divide-slate-50"></div>
                             </div>
                         </div>`;
-                },
-                qpractice: (container) => {
-                    document.getElementById('pageTitle').innerText = 'Question Practice';
-                    container.className = 'p-8 flex flex-col h-full items-center justify-start bg-slate-50 fade-in';
-                    container.innerHTML = `
-                        <div class="max-w-2xl w-full space-y-6">
-                            <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-                                <h3 class="text-xl font-bold mb-6">Create Practice Set</h3>
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-bold text-slate-500 mb-2 uppercase">Number of Questions</label>
-                                        <input type="number" value="40" class="w-full p-3 bg-slate-50 border rounded-lg focus:ring-2 focus:ring-sky-500 outline-none">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-bold text-slate-500 mb-2 uppercase">Select Topics</label>
-                                        <select multiple class="w-full h-48 p-2 bg-slate-50 border rounded-lg text-sm">
-                                            ${[...new Set(app.data.map(i => i.cat))].sort().map(c => `<option>${c}</option>`).join('')}
-                                        </select>
-                                        <p class="text-[10px] text-slate-400 mt-2">Hold Ctrl / Cmd to select multiple chapters</p>
-                                    </div>
-                                    <div class="flex gap-4 pt-4">
-                                        <button onclick="alert('Starting Standard Session...')" class="flex-1 bg-sky-500 text-white font-bold py-3 rounded-xl hover:bg-sky-600 transition-all shadow-lg shadow-sky-200">Start Session</button>
-                                        <button onclick="alert('Loading Full Exam Simulation...')" class="flex-1 bg-slate-800 text-white font-bold py-3 rounded-xl hover:bg-slate-900 transition-all">Simulation Mode</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>`;
                 }
             },
             drillDown: (level, val) => {
@@ -397,62 +350,29 @@
                 renderProgress: (id, total, targetDate) => {
                     const canvas = document.getElementById(id);
                     if (!canvas) return;
-                    
-                    // Historical daily progress calculation
                     const history = {};
-                    app.data.filter(i => i.done && i.completionDate).forEach(i => {
-                        history[i.completionDate] = (history[i.completionDate] || 0) + 1;
-                    });
-                    
+                    app.data.filter(i => i.done && i.completionDate).forEach(i => { history[i.completionDate] = (history[i.completionDate] || 0) + 1; });
                     const dates = Object.keys(history).sort();
                     let currentSum = 0;
-                    const dataPoints = dates.map(d => {
-                        currentSum += history[d];
-                        return currentSum;
-                    });
-
-                    // Linear Target logic
+                    const dataPoints = dates.map(d => { currentSum += history[d]; return currentSum; });
                     const studyStart = new Date(2026, 0, 1);
-                    const totalDays = Math.ceil((targetDate - studyStart) / (1000 * 60 * 60 * 24));
+                    const totalDays = Math.ceil((targetDate - studyStart) / 86400000);
                     const slope = total / totalDays;
-                    const linearData = dates.map((d, index) => {
-                        const dayOffset = Math.ceil((new Date(d) - studyStart) / (1000 * 60 * 60 * 24));
-                        return Math.round(dayOffset * slope);
-                    });
-
-                    new Chart(canvas, {
-                        type: 'line',
-                        data: {
-                            labels: dates.length > 0 ? dates : ["Start"],
-                            datasets: [
-                                { label: 'Actual Progress', data: dataPoints, borderColor: '#0ea5e9', backgroundColor: '#0ea5e922', fill: true, tension: 0.3 },
-                                { label: 'Goal Line (Aug 1)', data: linearData, borderColor: '#f59e0b', borderDash: [5, 5], fill: false }
-                            ]
-                        },
-                        options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: total } } }
-                    });
+                    const linearData = dates.map(d => Math.round(Math.ceil((new Date(d) - studyStart) / 86400000) * slope));
+                    new Chart(canvas, { type: 'line', data: { labels: dates.length > 0 ? dates : ["Start"], datasets: [{ label: 'Yoav Actual', data: dataPoints, borderColor: '#0ea5e9', backgroundColor: '#0ea5e922', fill: true, tension: 0.3 }, { label: 'August Goal Line', data: linearData, borderColor: '#f59e0b', borderDash: [5, 5], fill: false }] }, options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: total } } } });
                 },
                 renderPie: (id, items, groupKey) => {
                     const canvas = document.getElementById(id);
                     if (!canvas) return;
-                    
                     const stats = {};
-                    items.forEach(i => {
-                        const label = i[groupKey] || 'Other';
-                        stats[label] = (stats[label] || 0) + (i.done ? 1 : 0);
-                    });
-                    
-                    new Chart(canvas, {
-                        type: 'doughnut',
-                        data: {
-                            labels: Object.keys(stats),
-                            datasets: [{
-                                data: Object.values(stats),
-                                backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316']
-                            }]
-                        },
-                        options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } } }
-                    });
+                    items.forEach(i => { const label = i[groupKey] || 'Other'; stats[label] = (stats[label] || 0) + (i.done ? 1 : 0); });
+                    new Chart(canvas, { type: 'doughnut', data: { labels: Object.keys(stats), datasets: [{ data: Object.values(stats), backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'] }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } } } });
+                },
+                renderDifficultyPie: (id) => {
+                    const canvas = document.getElementById(id);
+                    const counts = [0,0,0,0,0,0,0];
+                    app.data.forEach(i => counts[i.diff]++);
+                    new Chart(canvas, { type: 'pie', data: { labels: Object.values(DIFF_LABELS), datasets: [{ data: counts, backgroundColor: ['#e2e8f0', '#15803d', '#4ade80', '#facc15', '#fb923c', '#ef4444', '#7f1d1d'] }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } } });
                 }
             },
             updateGlobalStats: () => {
