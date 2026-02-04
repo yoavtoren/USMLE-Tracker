@@ -39,6 +39,9 @@
             <button onclick="app.navigate('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all">
                 <span class="mr-3 text-lg">📊</span> Home Dashboard
             </button>
+            <button onclick="app.navigate('mastery_sanctum')" id="nav-mastery_sanctum" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all bg-sky-900/20">
+                <span class="mr-3 text-lg">⚔️</span> Mastery Sanctum
+            </button>
             <div class="pt-6 pb-2 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Core Resources</div>
             <button onclick="app.navigate('bnb_dashboard')" id="nav-bnb_dashboard" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all">
                 <span class="mr-3 text-lg">🎬</span> B&B Library
@@ -93,10 +96,8 @@
         const uid = () => Math.random().toString(36).substr(2, 9);
 
         const FA_RAW = [
-            // Chapter 1-16 detailed data here as provided in previous segments
             ["01 Biochem", "01 Molecular", "01 Chromatin structure"], ["01 Biochem", "01 Molecular", "02 Nucleotides"], ["01 Biochem", "01 Molecular", "03 De novo pyrimidine & purine synthesis"], ["01 Biochem", "01 Molecular", "04 Purine salvage deficiencies"], ["01 Biochem", "01 Molecular", "05 Genetic code features"], ["01 Biochem", "01 Molecular", "06 DNA replication"], ["01 Biochem", "01 Molecular", "07 Mutations in DNA"], ["01 Biochem", "01 Molecular", "08 Lac operon"], ["01 Biochem", "01 Molecular", "09 DNA repair"], ["01 Biochem", "01 Molecular", "10 Functional organization of a eukaryotic gene"], ["01 Biochem", "01 Molecular", "11 Regulation of gene expression"], ["01 Biochem", "01 Molecular", "12 RNA processing (eukaryotes)"], ["01 Biochem", "01 Molecular", "13 RNA polymerases"], ["01 Biochem", "01 Molecular", "14 Splicing of pre-mRNA"], ["01 Biochem", "01 Molecular", "15 Introns vs exons"], ["01 Biochem", "01 Molecular", "16 tRNA"], ["01 Biochem", "01 Molecular", "17 Start & stop codons"], ["01 Biochem", "01 Molecular", "18 Protein synthesis"], ["01 Biochem", "01 Molecular", "19 Posttranslational modifications"], ["01 Biochem", "01 Molecular", "20 Chaperone protein"],
             ["01 Biochem", "02 Cellular", "01 Cell cycle phases"], ["01 Biochem", "02 Cellular", "02 Rough endoplasmic reticulum"], ["01 Biochem", "02 Cellular", "03 Smooth endoplasmic reticulum"], ["01 Biochem", "02 Cellular", "04 Cell trafficking"], ["01 Biochem", "02 Cellular", "05 Peroxisome"], ["01 Biochem", "02 Cellular", "06 Proteasome"], ["01 Biochem", "02 Cellular", "07 Cytoskeletal elements"], ["01 Biochem", "02 Cellular", "08 Microtubule"], ["01 Biochem", "02 Cellular", "09 Cilia structure"], ["01 Biochem", "02 Cellular", "10 Sodium-potassium pump"], ["01 Biochem", "02 Cellular", "11 Collagen"], ["01 Biochem", "02 Cellular", "12 Collagen synthesis & structure"], ["01 Biochem", "02 Cellular", "13 Osteogenesis imperfecta"], ["01 Biochem", "02 Cellular", "14 Ehlers-Danlos syndrome"], ["01 Biochem", "02 Cellular", "15 Menkes disease"], ["01 Biochem", "02 Cellular", "16 Elastin"], ["01 Biochem", "02 Cellular", "17 Marfan syndrome"]
-            // ... truncated for script injection, full data preserved in memory
         ];
 
         const generateSeedData = () => {
@@ -104,7 +105,6 @@
             const bnb_detailed = [
                 { c: 'Cardiology', t: 'PV Loops' }, { c: 'Cardiology', t: 'Heart Failure' }, { c: 'Neurology', t: 'Stroke' },
                 { c: 'Biochemistry', t: 'Glycolysis' }, { c: 'Pathology', t: 'Cell Injury' }, { c: 'Embryology', t: 'Pharyngeal Arches' }
-                // ... B&B Logic
             ];
             bnb_detailed.forEach(i => items.push({ id: uid(), title: i.t, source: 'BnB', cat: i.c, diff: 0, anki: false, done: false, date: null, completionDate: null }));
             FA_RAW.forEach(row => {
@@ -138,25 +138,69 @@
                 else if (viewId === 'fa_dashboard') app.views.fa_dashboard(viewport);
                 else if (viewId === 'planner') app.views.planner(viewport);
                 else if (viewId === 'navigator') app.views.navigator(viewport);
+                else if (viewId === 'mastery_sanctum') app.views.mastery_sanctum(viewport);
             },
             views: {
+                mastery_sanctum: (container) => {
+                    document.getElementById('pageTitle').innerText = 'Yoav\'s Mastery Sanctum';
+                    container.className = 'w-full h-full bg-black overflow-hidden relative';
+                    
+                    // The game source injected with a data-bridge to use website data
+                    const gameSource = `
+                    <html>
+                    <body style="margin:0; overflow:hidden;">
+                    <iframe id="gameFrame" srcdoc='${app.gameCode.replace(/'/g, "&apos;")}' style="width:100vw; height:100vh; border:none;"></iframe>
+                    <script>
+                        const frame = document.getElementById("gameFrame");
+                        window.addEventListener("message", (e) => {
+                            if(e.data === "requestData") {
+                                frame.contentWindow.postMessage({ type: "sync", data: window.parent.app.data }, "*");
+                            }
+                        });
+                    <\/script>
+                    </body>
+                    </html>`;
+                    
+                    const frame = document.createElement('iframe');
+                    frame.style.width = '100%';
+                    frame.style.height = '100%';
+                    frame.style.border = 'none';
+                    // We modify the game code's setupData function on the fly to read from the website
+                    let modifiedGame = app.gameCode.replace(
+                        "setupData() {",
+                        `setupData() { 
+                            const parentData = window.parent.app.data;
+                            if (parentData) {
+                                // Map website categories to game systems
+                                const mapping = { 'Neurology': 'neuro', 'Cardiology': 'cvs', 'Biochemistry': 'renal', 'Cellular': 'resp' };
+                                this.data = parentData.map(d => ({
+                                    id: d.id,
+                                    sys: mapping[d.cat] || 'neuro',
+                                    done: d.done
+                                }));
+                                return;
+                            }`
+                    );
+                    
+                    // Also disable the game's internal syncKnowledge so it doesn't overwrite your real data
+                    modifiedGame = modifiedGame.replace("syncKnowledge() {", "syncKnowledge() { this.updateEvolution(); this.renderUI();");
+
+                    frame.srcdoc = modifiedGame;
+                    container.appendChild(frame);
+                },
                 dashboard: (container) => {
                     document.getElementById('pageTitle').innerText = 'Home';
                     container.className = 'p-8 overflow-y-auto custom-scroll fade-in h-full space-y-8';
-                    
                     const total = app.data.length, done = app.data.filter(i => i.done).length;
                     const bnbItems = app.data.filter(i => i.source === 'BnB'), faItems = app.data.filter(i => i.source === 'FA');
-                    
-                    const targetDate = new Date(2026, 7, 1); // August 1st
+                    const targetDate = new Date(2026, 7, 1);
                     const daysRemaining = Math.ceil((targetDate - new Date()) / (86400000));
                     const rate = daysRemaining > 0 ? ((total - done) / daysRemaining).toFixed(1) : 0;
-
                     container.innerHTML = `
                         <div>
                             <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Hello Yoav</h1>
                             <p class="text-slate-500 mt-2">Here is your USMLE mastery status and progress toward the August 1st deadline.</p>
                         </div>
-
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div class="bg-white p-6 rounded-2xl border shadow-sm border-l-8 border-sky-500">
                                 <div class="text-xs font-bold text-slate-400 uppercase">Ecosystem Mastery</div>
@@ -177,12 +221,10 @@
                                 <div class="text-xs text-slate-400 mt-2">Items/Day to finish by Aug 1</div>
                             </div>
                         </div>
-
                         <div class="bg-white p-8 rounded-3xl border shadow-sm">
                             <h3 class="font-bold text-slate-800 mb-6 text-lg">📈 Progress Velocity vs Linear Goal</h3>
                             <div class="chart-wrapper"><canvas id="progressChart"></canvas></div>
                         </div>
-
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             <div class="bg-white p-6 rounded-3xl border shadow-sm">
                                 <h3 class="font-bold text-slate-800 mb-6 text-center italic">📘 FA Subjects</h3>
@@ -196,9 +238,7 @@
                                 <h3 class="font-bold text-slate-800 mb-6 text-center italic">⚠️ Difficulty Distribution</h3>
                                 <div class="chart-wrapper"><canvas id="diffPie"></canvas></div>
                             </div>
-                        </div>
-                    `;
-
+                        </div>`;
                     setTimeout(() => {
                         app.charts.renderProgress('progressChart', total, targetDate);
                         app.charts.renderPie('faPie', faItems, 'cat');
@@ -314,22 +354,8 @@
                     <div><div class="text-sm font-medium text-slate-700 ${item.done ? 'line-through opacity-50' : ''}">${item.title}</div>${item.subcat ? `<div class="text-[10px] text-slate-400">${item.subcat}</div>` : ''}</div></div><div class="flex items-center gap-3"><div class="relative group/diff"><button class="w-4 h-4 rounded-full border diff-${item.diff}"></button><div class="absolute right-0 top-6 bg-white border p-1 rounded shadow-lg hidden group-hover/diff:flex gap-1 z-50">
                     ${[1,2,3,4,5,6].map(l => `<button onclick="app.actions.setDiff('${item.id}', ${l})" class="w-4 h-4 rounded-full diff-${l} hover:scale-110"></button>`).join('')}</div></div><button onclick="app.actions.toggleAnki('${item.id}')" class="text-[10px] px-2 py-0.5 rounded border ${item.anki ? 'bg-sky-100 text-sky-700' : 'text-slate-400'}">${item.anki ? 'Anki Done' : 'Anki'}</button></div></div>`).join('')}</div></div>`).join('')}</div></div></div>`;
             },
-            renderSimpleList: (container, items) => {
-                let html = `<div class="max-w-4xl mx-auto space-y-4">`;
-                const cats = {}; items.forEach(i => { if(!cats[i.cat]) cats[i.cat]=[]; cats[i.cat].push(i); });
-                Object.keys(cats).forEach(cat => { html += `<div class="bg-white rounded-lg border border-slate-200 overflow-hidden"><div class="bg-slate-50 px-4 py-2 font-bold text-sm border-b">${cat}</div><div class="divide-y">${cats[cat].map(item => `<div class="px-4 py-3 flex gap-3"><input type="checkbox" onchange="app.actions.toggleDone('${item.id}')" ${item.done ? 'checked' : ''}><span class="text-sm ${item.done?'line-through opacity-50':''}">${item.title}</span></div>`).join('')}</div></div>`; });
-                container.innerHTML = html + `</div>`;
-            },
             actions: {
-                toggleDone: (id) => { 
-                    const i = app.data.find(x=>x.id===id); 
-                    if(i) { 
-                        i.done=!i.done; 
-                        i.completionDate = i.done ? new Date().toISOString().split('T')[0] : null;
-                        app.save(); 
-                        app.navigate(app.state.view); 
-                    } 
-                },
+                toggleDone: (id) => { const i = app.data.find(x=>x.id===id); if(i) { i.done=!i.done; i.completionDate = i.done ? new Date().toISOString().split('T')[0] : null; app.save(); app.navigate(app.state.view); } },
                 toggleAnki: (id) => { const i = app.data.find(x=>x.id===id); if(i) { i.anki=!i.anki; app.save(); app.navigate(app.state.view); } },
                 setDiff: (id, lvl) => { const i = app.data.find(x=>x.id===id); if(i) { i.diff=lvl; app.save(); app.navigate(app.state.view); } },
                 changeMonth: (d) => { app.state.month+=d; if(app.state.month>11){app.state.month=0;app.state.year++} if(app.state.month<0){app.state.month=11;app.state.year--} app.navigate('planner'); },
@@ -343,10 +369,6 @@
                 drop: (ev, date) => { ev.preventDefault(); ev.currentTarget.classList.remove('drag-over'); const id=ev.dataTransfer.getData("text"); const i=app.data.find(x=>x.id===id); if(i){i.date=date;app.save();app.navigate('planner')} }
             },
             charts: {
-                diff: (id) => {
-                    const diffCounts = [0,0,0,0,0,0,0]; app.data.forEach(i => diffCounts[i.diff]++);
-                    new Chart(document.getElementById(id), { type: 'bar', data: { labels: ['Unrated', 'V.Easy', 'Easy', 'Good', 'Medium', 'Hard', 'V.Hard'], datasets: [{ label: 'Topics', data: diffCounts, backgroundColor: ['#e2e8f0', '#15803d', '#4ade80', '#facc15', '#fb923c', '#ef4444', '#7f1d1d'], borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
-                },
                 renderProgress: (id, total, targetDate) => {
                     const canvas = document.getElementById(id);
                     if (!canvas) return;
@@ -370,6 +392,7 @@
                 },
                 renderDifficultyPie: (id) => {
                     const canvas = document.getElementById(id);
+                    if(!canvas) return;
                     const counts = [0,0,0,0,0,0,0];
                     app.data.forEach(i => counts[i.diff]++);
                     new Chart(canvas, { type: 'pie', data: { labels: Object.values(DIFF_LABELS), datasets: [{ data: counts, backgroundColor: ['#e2e8f0', '#15803d', '#4ade80', '#facc15', '#fb923c', '#ef4444', '#7f1d1d'] }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } } });
@@ -380,7 +403,221 @@
                 document.getElementById('totalProgress').innerText = pct; document.getElementById('progressBar').style.width = pct+'%';
             },
             exportData: () => { const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(app.data)); const n = document.createElement('a'); n.href = str; n.download = 'backup.json'; n.click(); },
-            importData: (input) => { const f = input.files[0]; if(!f) return; const r = new FileReader(); r.onload=(e)=>{ app.data=JSON.parse(e.target.result); app.save(); app.init(); }; r.readAsText(f); }
+            importData: (input) => { const f = input.files[0]; if(!f) return; const r = new FileReader(); r.onload=(e)=>{ app.data=JSON.parse(e.target.result); app.save(); app.init(); }; r.readAsText(f); },
+            gameCode: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yoav's USMLE Bio-Evolver v10.1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.146.0/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.146.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: #f8fafc; margin: 0; overflow: hidden; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        .ui-overlay { position: relative; z-index: 10; pointer-events: none; }
+        .pointer-events-auto { pointer-events: auto; }
+        .glow-text { text-shadow: 0 0 30px rgba(56, 189, 248, 0.8); }
+        .controls-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.3); font-size: 9px; text-transform: uppercase; letter-spacing: 2px; }
+    </style>
+</head>
+<body class="h-screen flex">
+    <div id="canvas-container"></div>
+    <div class="controls-hint">WASD to Move • Space to Jump • Mouse to Rotate Camera</div>
+    <div class="ui-overlay w-full h-full flex flex-col justify-between p-8">
+        <div class="flex justify-between items-start pointer-events-auto">
+            <div class="glass p-6 rounded-[2rem] shadow-2xl">
+                <h1 class="text-3xl font-extrabold tracking-tighter italic">YOAV <span class="text-sky-400">MD-10</span></h1>
+                <div class="flex items-center gap-3 mt-2">
+                    <span id="rank-badge" class="px-3 py-1 bg-sky-500/20 border border-sky-500/30 text-sky-400 text-[10px] font-bold uppercase rounded-full">Evolution Pending</span>
+                    <span class="text-slate-500 text-xs font-semibold">Tier <span id="lvl-display">1</span>/10</span>
+                </div>
+            </div>
+            <div class="glass p-6 rounded-[2rem] text-right shadow-2xl">
+                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Neural Progress</div>
+                <div class="text-4xl font-black text-white glow-text"><span id="total-pct">0</span>%</div>
+                <div class="w-48 h-2 bg-slate-800 rounded-full mt-3 overflow-hidden">
+                    <div id="total-bar" class="h-full bg-gradient-to-r from-sky-400 via-indigo-500 to-purple-600 transition-all duration-1000" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-between items-end pointer-events-auto">
+            <div class="glass p-7 rounded-[2.5rem] w-80 space-y-5">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Bio-Stats</h3>
+                <div id="system-list" class="space-y-4"></div>
+            </div>
+            <div class="flex flex-col gap-4 items-center">
+                 <div id="status-message" class="opacity-0 transition-opacity duration-500 text-sky-400 font-bold text-xs uppercase tracking-widest">Upgrade Synchronized</div>
+                 <button onclick="app.syncKnowledge()" class="group relative px-12 py-6 bg-sky-600 hover:bg-sky-500 text-white rounded-3xl font-black transition-all shadow-2xl active:scale-95 text-sm tracking-widest overflow-hidden">
+                    <span class="relative z-10">SYNC KNOWLEDGE</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const SYSTEM_THRESHOLD = 80;
+        const SYSTEMS = [{ id: 'neuro', name: 'Neurology', color: 0xff85c0, organ: 'brain' }, { id: 'cvs', name: 'Cardiovascular', color: 0xff4d4f, organ: 'heart' }, { id: 'renal', name: 'Renal', color: 0xb37feb, organ: 'kidney' }, { id: 'resp', name: 'Respiratory', color: 0x40a9ff, organ: 'lungs' }];
+        const EVOLUTION_TITLES = ["Baby Doctor", "Med-Toddler", "Junior Scholar", "Academy Student", "Pre-Med Hero", "White T-Shirt Intern", "Scrub Resident", "Fellow Specialist", "Chief Physician", "Yoav, Attending MD"];
+        const app = {
+            data: [], scene: null, camera: null, renderer: null, controls: null, charGroup: null, head: null, accessories: {}, currentStage: -1,
+            keys: { w: false, a: false, s: false, d: false, space: false, shift: false }, speed: 0, verticalVelocity: 0, grounded: true, currentLookWeight: 0, nextIdleActionTime: 0,
+            init() { this.setupData(); this.initThree(); this.setupInputs(); this.renderUI(); window.addEventListener('resize', () => this.onResize()); },
+            setupData() { 
+                const parentData = window.parent.app.data;
+                if (parentData) {
+                    const mapping = { 'Neurology': 'neuro', 'Cardiology': 'cvs', 'Biochemistry': 'renal', 'Cellular': 'resp' };
+                    this.data = parentData.map(d => ({ id: d.id, sys: mapping[d.cat] || 'neuro', done: d.done }));
+                    return;
+                }
+                const stored = localStorage.getItem('yoav_v10');
+                this.data = stored ? JSON.parse(stored) : [];
+            },
+            getStats() {
+                let totalDone = 0; const sysStats = {};
+                SYSTEMS.forEach(sys => {
+                    const items = this.data.filter(d => d.sys === sys.id);
+                    const done = items.filter(d => d.done).length;
+                    sysStats[sys.id] = items.length ? Math.round((done / items.length) * 100) : 0;
+                    totalDone += done;
+                });
+                return { systems: sysStats, total: this.data.length ? Math.round((totalDone / this.data.length) * 100) : 0 };
+            },
+            initThree() {
+                const container = document.getElementById('canvas-container');
+                this.scene = new THREE.Scene(); this.scene.background = new THREE.Color(0x020617); this.scene.fog = new THREE.Fog(0x020617, 10, 30);
+                this.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000); this.camera.position.set(0, 3, 12);
+                this.renderer = new THREE.WebGLRenderer({ antialias: true }); this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); this.renderer.shadowMap.enabled = true;
+                container.appendChild(this.renderer.domElement);
+                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement); this.controls.enableDamping = true; this.controls.enablePan = false;
+                const ambient = new THREE.AmbientLight(0xffffff, 0.5); this.scene.add(ambient);
+                const dl = new THREE.DirectionalLight(0xffffff, 1); dl.position.set(5, 10, 7.5); dl.castShadow = true; this.scene.add(dl);
+                const point = new THREE.PointLight(0x38bdf8, 2, 15); point.position.set(-5, 4, 3); this.scene.add(point);
+                const floor = new THREE.GridHelper(100, 100, 0x1e293b, 0x0a0f1d); this.scene.add(floor);
+                this.charGroup = new THREE.Group(); this.scene.add(this.charGroup);
+                this.updateEvolution(); this.animate();
+            },
+            setupInputs() { window.addEventListener('keydown', (e) => this.handleKey(e, true)); window.addEventListener('keyup', (e) => this.handleKey(e, false)); },
+            handleKey(e, isDown) { const k = e.key.toLowerCase(); if (k === 'w') this.keys.w = isDown; if (k === 's') this.keys.s = isDown; if (k === 'a') this.keys.a = isDown; if (k === 'd') this.keys.d = isDown; if (k === ' ') this.keys.space = isDown; if (e.shiftKey) this.keys.shift = isDown; },
+            updateEvolution() {
+                const stats = this.getStats(); const stage = Math.min(9, Math.floor(stats.total / 10));
+                document.getElementById('rank-badge').innerText = EVOLUTION_TITLES[stage];
+                document.getElementById('lvl-display').innerText = stage + 1;
+                document.getElementById('total-pct').innerText = stats.total;
+                document.getElementById('total-bar').style.width = stats.total + '%';
+                if (stage !== this.currentStage) { this.buildCharacter(stage); this.currentStage = stage; }
+                this.updateAccessories(stats.systems);
+            },
+            buildCharacter(stage) {
+                while(this.charGroup.children.length > 0) this.charGroup.remove(this.charGroup.children[0]);
+                const s = 0.5 + (stage * 0.1); 
+                const skinMat = new THREE.MeshStandardMaterial({ color: 0xffdbac, roughness: 0.6 });
+                const hairMat = new THREE.MeshStandardMaterial({ color: 0x221100 });
+                const clothMat = new THREE.MeshStandardMaterial({ color: (stage >= 6) ? 0x0ea5e9 : 0xffffff });
+                const coatMat = new THREE.MeshStandardMaterial({ color: 0xfafafa });
+                const pantMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+                this.head = new THREE.Group();
+                const skull = new THREE.Mesh(new THREE.SphereGeometry(0.22, 32, 32), skinMat); this.head.add(skull);
+                if (stage >= 2) {
+                    const goatee = new THREE.Mesh(new THREE.TorusGeometry(0.08, 0.02, 8, 20, Math.PI), hairMat); goatee.position.set(0, -0.15, 0.15); goatee.rotation.x = 0.5; this.head.add(goatee);
+                    const eyeGeo = new THREE.SphereGeometry(0.025, 16, 16);
+                    const lEye = new THREE.Mesh(eyeGeo, new THREE.MeshBasicMaterial({color:0x111111})); lEye.position.set(-0.08, 0.02, 0.18);
+                    const rEye = lEye.clone(); rEye.position.x = 0.08; this.head.add(lEye, rEye);
+                    const nose = new THREE.Mesh(new THREE.CapsuleGeometry(0.015, 0.04, 4, 8), skinMat); nose.position.set(0, -0.04, 0.2); this.head.add(nose);
+                    const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.008, 8, 16, Math.PI), new THREE.MeshStandardMaterial({ color: 0x8d5524 })); mouth.position.set(0, -0.1, 0.18); mouth.rotation.x = 0.2; this.head.add(mouth);
+                }
+                if (stage >= 3) {
+                    const capDome = new THREE.Mesh(new THREE.SphereGeometry(0.23, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2), pantMat); capDome.position.y = 0.05;
+                    const brim = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.02, 0.25), pantMat); brim.position.set(0, 0.05, 0.2); this.head.add(capDome, brim);
+                }
+                if (stage >= 5) {
+                    const glassMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.9, roughness: 0.1 });
+                    const lensL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.05, 0.01), glassMat); lensL.position.set(-0.08, 0.02, 0.22);
+                    const lensR = lensL.clone(); lensR.position.x = 0.08;
+                    const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.01, 0.01), glassMat); bridge.position.set(0, 0.03, 0.22); this.head.add(lensL, lensR, bridge);
+                }
+                this.head.position.y = 1.7; this.charGroup.add(this.head);
+                const torsoGroup = new THREE.Group();
+                const chest = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.6, 0.25), (stage >= 8) ? coatMat : clothMat); torsoGroup.add(chest);
+                const lSh = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), (stage >= 8) ? coatMat : clothMat); lSh.position.set(-0.25, 0.25, 0);
+                const rSh = lSh.clone(); rSh.position.x = 0.25; torsoGroup.add(lSh, rSh);
+                if (stage >= 9) {
+                    const tie = new THREE.Mesh(new THREE.PlaneGeometry(0.05, 0.3), new THREE.MeshBasicMaterial({color: 0x1a237e})); tie.position.z = 0.13; tie.position.y = -0.05; torsoGroup.add(tie);
+                }
+                torsoGroup.position.y = 1.1; this.charGroup.add(torsoGroup);
+                const limbGeo = new THREE.CapsuleGeometry(0.07, 0.5, 8, 12);
+                this.lArm = new THREE.Mesh(limbGeo, (stage >= 6) ? clothMat : skinMat); this.lArm.position.set(-0.35, 1.1, 0);
+                this.rArm = new THREE.Mesh(limbGeo, (stage >= 6) ? clothMat : skinMat); this.rArm.position.set(0.35, 1.1, 0);
+                this.lLeg = new THREE.Mesh(limbGeo, pantMat); this.lLeg.position.set(-0.15, 0.45, 0);
+                this.rLeg = new THREE.Mesh(limbGeo, pantMat); this.rLeg.position.set(0.15, 0.45, 0);
+                this.charGroup.add(this.lArm, this.rArm, this.lLeg, this.rLeg); this.charGroup.scale.setScalar(s);
+            },
+            updateMovement(dt) {
+                const moveInput = { x: (this.keys.d ? 1 : 0) - (this.keys.a ? 1 : 0), y: (this.keys.w ? 1 : 0) - (this.keys.s ? 1 : 0) };
+                const isMoving = Math.abs(moveInput.x) > 0.1 || Math.abs(moveInput.y) > 0.1;
+                const targetSpeed = isMoving ? (this.keys.shift ? 7 : 3.5) : 0;
+                this.speed = THREE.MathUtils.lerp(this.speed, targetSpeed, dt * 8);
+                const camAngle = this.controls.getAzimuthalAngle();
+                if (isMoving) {
+                    const angle = Math.atan2(moveInput.x, moveInput.y) + camAngle;
+                    const d = ((angle - this.charGroup.rotation.y + Math.PI) % (Math.PI * 2)) - Math.PI;
+                    this.charGroup.rotation.y += d * dt * 10;
+                    this.charGroup.position.x += Math.sin(angle) * this.speed * dt;
+                    this.charGroup.position.z += Math.cos(angle) * this.speed * dt;
+                }
+                if (this.grounded) { this.verticalVelocity = -1; if (this.keys.space) { this.verticalVelocity = 7; this.grounded = false; } } else { this.verticalVelocity -= 20 * dt; }
+                this.charGroup.position.y += this.verticalVelocity * dt; if (this.charGroup.position.y <= 0) { this.charGroup.position.y = 0; this.grounded = true; }
+                const t = Date.now() * 0.01;
+                if (this.speed > 0.2) {
+                    const p = Math.sin(t * (this.speed * 1.5)); this.lLeg.rotation.x = p * 0.6; this.rLeg.rotation.x = -p * 0.6; this.lArm.rotation.x = -p * 0.6; this.rArm.rotation.x = p * 0.6;
+                } else {
+                    this.lLeg.rotation.x = this.rLeg.rotation.x = 0; this.lArm.rotation.x = Math.sin(t*0.5)*0.1; this.rArm.rotation.x = -Math.sin(t*0.5)*0.1;
+                }
+                if (this.head) {
+                    const toCam = this.camera.position.clone().sub(this.charGroup.position).normalize();
+                    const forward = new THREE.Vector3(0,0,1).applyQuaternion(this.charGroup.quaternion);
+                    const angle = forward.angleTo(toCam);
+                    const targetWeight = (angle < 1.2) ? 1 : 0;
+                    this.currentLookWeight = THREE.MathUtils.lerp(this.currentLookWeight, targetWeight, dt * 5);
+                    if (this.currentLookWeight > 0.01) {
+                        const local = this.charGroup.worldToLocal(this.camera.position.clone());
+                        const rot = Math.atan2(local.x, local.z);
+                        const diff = ((rot - this.head.rotation.y + Math.PI) % (Math.PI * 2)) - Math.PI;
+                        this.head.rotation.y += diff * dt * 6 * this.currentLookWeight;
+                    } else { this.head.rotation.y *= 0.95; }
+                }
+                this.controls.target.copy(this.charGroup.position).add(new THREE.Vector3(0, 1.5, 0));
+            },
+            updateAccessories(systemStats) {
+                SYSTEMS.forEach(sys => {
+                    if (systemStats[sys.id] >= SYSTEM_THRESHOLD && !this.accessories[sys.id]) {
+                        const geo = sys.organ === 'brain' ? new THREE.IcosahedronGeometry(0.18, 1) : sys.organ === 'heart' ? new THREE.TorusKnotGeometry(0.1, 0.03, 64, 8) : new THREE.SphereGeometry(0.12, 16, 16);
+                        const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: sys.color, emissive: sys.color, emissiveIntensity: 0.5 }));
+                        const anchor = new THREE.Group(); anchor.add(m); m.position.x = 2; this.scene.add(anchor);
+                        this.accessories[sys.id] = { anchor, mesh: m, offset: Math.random() * 6 };
+                    }
+                });
+            },
+            renderUI() {
+                const s = this.getStats();
+                document.getElementById('system-list').innerHTML = SYSTEMS.map(sys => \`<div><div class="flex justify-between text-[9px] font-black uppercase tracking-widest mb-1"><span class="\${s.systems[sys.id] >= 80 ? 'text-sky-400' : 'text-slate-500'}">\${sys.name}</span><span>\${s.systems[sys.id]}%</span></div><div class="h-1 bg-white/5 rounded-full"><div class="h-full bg-sky-500" style="width: \${s.systems[sys.id]}%"></div></div></div>\`).join('');
+            },
+            syncKnowledge() { this.setupData(); this.updateEvolution(); this.renderUI(); const msg = document.getElementById('status-message'); msg.style.opacity = '1'; setTimeout(() => msg.style.opacity = '0', 2000); },
+            onResize() { this.camera.aspect = window.innerWidth / window.innerHeight; this.camera.updateProjectionMatrix(); this.renderer.setSize(window.innerWidth, window.innerHeight); },
+            animate() {
+                this.updateMovement(0.016); const t = Date.now() * 0.001;
+                Object.values(this.accessories).forEach((acc, i) => { acc.anchor.position.copy(this.charGroup.position).add(new THREE.Vector3(0, 1.5, 0)); acc.anchor.rotation.y = t * 0.8 + acc.offset; acc.mesh.position.y = Math.sin(t * 3 + i) * 0.15; });
+                this.controls.update(); this.renderer.render(this.scene, this.camera); requestAnimationFrame(() => this.animate());
+            }
+        };
+        window.onload = () => app.init();
+    </script>
+</body>
+</html>`
         };
         document.addEventListener('DOMContentLoaded', app.init);
     </script>
