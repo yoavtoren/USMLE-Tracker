@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USMLE 2026 Master Tracker</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Base Styles */
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        
+        /* Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
+
+        /* Chart Containers */
+        .chart-wrapper { position: relative; height: 260px; width: 100%; }
+
+        /* Difficulty Colors (0-6) */
+        .diff-0 { background-color: #e2e8f0; border-color: #cbd5e1; } /* Unrated */
+        .diff-1 { background-color: #15803d; border-color: #14532d; color: white; } /* Very Easy */
+        .diff-2 { background-color: #4ade80; border-color: #16a34a; color: #064e3b; } /* Easy */
+        .diff-3 { background-color: #facc15; border-color: #ca8a04; color: #713f12; } /* Good */
+        .diff-4 { background-color: #fb923c; border-color: #ea580c; color: #7c2d12; } /* Medium */
+        .diff-5 { background-color: #ef4444; border-color: #b91c1c; color: white; } /* Hard */
+        .diff-6 { background-color: #7f1d1d; border-color: #450a0a; color: white; } /* Very Hard */
+
+        /* Planner Drag & Drop */
+        .droppable-day { min-height: 100px; transition: all 0.2s; }
+        .droppable-day.drag-over { background-color: #e0f2fe; box-shadow: inset 0 0 0 2px #3b82f6; }
+        .draggable-item { cursor: grab; user-select: none; }
+        .draggable-item:active { cursor: grabbing; opacity: 0.8; }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden text-slate-800 bg-slate-50">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col z-20 shadow-xl">
+        <div class="p-6 border-b border-slate-800">
+            <h1 class="text-2xl font-bold text-white tracking-tight">USMLE<span class="text-sky-500">Tracker</span></h1>
+            <p class="text-xs text-slate-500 mt-1">2026 Interactive Planner</p>
+        </div>
+        
+        <nav class="flex-grow p-4 space-y-1 overflow-y-auto custom-scroll">
+            <button onclick="app.navigate('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all active-nav">
+                <span class="mr-3 text-lg">📊</span> Dashboard
+            </button>
+            
+            <div class="pt-6 pb-2 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Content Library</div>
+            
+            <button onclick="app.navigate('bnb')" id="nav-bnb" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all">
+                <span class="mr-3 text-lg">🎬</span> B&B Videos
+            </button>
+            <button onclick="app.navigate('sketchy')" id="nav-sketchy" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all">
+                <span class="mr-3 text-lg">🦠</span> Sketchy Micro
+            </button>
+            <button onclick="app.navigate('fa')" id="nav-fa" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all">
+                <span class="mr-3 text-lg">📘</span> First Aid Checklist
+            </button>
+
+            <div class="pt-6 pb-2 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Tools</div>
+            
+            <button onclick="app.navigate('planner')" id="nav-planner" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all">
+                <span class="mr-3 text-lg">📅</span> 2026 Planner
+            </button>
+            <button onclick="app.exportData()" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-sky-400 transition-all text-sm mt-4">
+                <span class="mr-3">💾</span> Backup Data
+            </button>
+            <label class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-emerald-400 transition-all text-sm cursor-pointer">
+                <span class="mr-3">📂</span> Import Data
+                <input type="file" onchange="app.importData(this)" class="hidden" accept=".json">
+            </label>
+        </nav>
+
+        <div class="p-4 bg-slate-950 text-xs text-center text-slate-600 border-t border-slate-800">
+            v1.0 • Offline Ready
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow flex flex-col h-full overflow-hidden relative">
+        
+        <!-- HEADER -->
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shadow-sm z-10">
+            <h2 id="pageTitle" class="text-xl font-bold text-slate-800">Overview</h2>
+            
+            <div class="flex items-center gap-6">
+                <!-- Global Stats -->
+                <div class="flex items-center gap-3">
+                    <div class="text-right">
+                        <div class="text-xs text-slate-500 font-medium uppercase">Total Progress</div>
+                        <div class="text-sm font-bold text-slate-800"><span id="totalProgress">0</span>%</div>
+                    </div>
+                    <div class="w-32 h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-100">
+                        <div id="progressBar" class="h-full bg-sky-500 transition-all duration-700 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- DYNAMIC VIEWPORT -->
+        <div id="viewport" class="flex-grow overflow-hidden relative bg-slate-50/50">
+            <!-- Views are injected here -->
+        </div>
+
+    </main>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // --- 1. CONFIGURATION & DATA SEEDING ---
+        const DIFF_LABELS = {
+            1: "Very Easy", 2: "Easy", 3: "Good", 
+            4: "Medium", 5: "Hard", 6: "Very Hard"
+        };
+
+        // Generates initial dummy data if none exists
+        const generateSeedData = () => [
+            { id: 'b1', title: 'Cardiac Embryology', source: 'BnB', cat: 'Cardiology', diff: 0, anki: false, done: false, date: null },
+            { id: 'b2', title: 'Action Potentials', source: 'BnB', cat: 'Cardiology', diff: 5, anki: true, done: false, date: null },
+            { id: 'b3', title: 'Starling Curve', source: 'BnB', cat: 'Cardiology', diff: 2, anki: false, done: true, date: null },
+            { id: 'b4', title: 'Stroke Syndromes', source: 'BnB', cat: 'Neurology', diff: 6, anki: false, done: false, date: null },
+            { id: 's1', title: 'Staph Aureus', source: 'Sketchy', cat: 'Gram Positive', diff: 1, anki: true, done: true, date: null },
+            { id: 's2', title: 'Strep Pyogenes', source: 'Sketchy', cat: 'Gram Positive', diff: 0, anki: false, done: false, date: null },
+            { id: 's3', title: 'HIV & AIDS', source: 'Sketchy', cat: 'Viruses', diff: 4, anki: true, done: false, date: null },
+            { id: 'f1', title: 'Metabolism: Glycolysis', source: 'FA', cat: 'Biochem', diff: 5, anki: false, done: false, date: null },
+            { id: 'f2', title: 'Immuno: Hypersensitivities', source: 'FA', cat: 'Immunology', diff: 3, anki: true, done: false, date: null }
+        ];
+
+        // --- 2. CORE APPLICATION ---
+        const app = {
+            data: [],
+            state: {
+                view: 'dashboard',
+                month: 0, // Jan = 0
+                year: 2026
+            },
+
+            // Initialization
+            init: () => {
+                const stored = localStorage.getItem('usmle_data');
+                app.data = stored ? JSON.parse(stored) : generateSeedData();
+                app.navigate('dashboard');
+                app.updateGlobalStats();
+            },
+
+            // Persistence
+            save: () => {
+                localStorage.setItem('usmle_data', JSON.stringify(app.data));
+                app.updateGlobalStats();
+            },
+
+            // Navigation Logic
+            navigate: (viewId) => {
+                app.state.view = viewId;
+                
+                // Update UI Sidebar
+                document.querySelectorAll('.nav-item').forEach(el => {
+                    el.classList.remove('bg-slate-800', 'text-white', 'shadow-inner');
+                    el.classList.add('text-slate-300');
+                });
+                const active = document.getElementById(`nav-${viewId}`);
+                if(active) {
+                    active.classList.add('bg-slate-800', 'text-white', 'shadow-inner');
+                    active.classList.remove('text-slate-300');
+                }
+
+                // Render View
+                const viewport = document.getElementById('viewport');
+                viewport.innerHTML = ''; // Clear current
+                
+                if (viewId === 'dashboard') app.views.dashboard(viewport);
+                else if (viewId === 'planner') app.views.planner(viewport);
+                else app.views.list(viewport, viewId);
+            },
+
+            // --- 3. VIEW RENDERERS ---
+            views: {
+                // DASHBOARD VIEW
+                dashboard: (container) => {
+                    document.getElementById('pageTitle').innerText = 'Study Dashboard';
+                    container.className = 'p-8 overflow-y-auto custom-scroll fade-in h-full';
+
+                    const total = app.data.length;
+                    const done = app.data.filter(i => i.done).length;
+                    const anki = app.data.filter(i => i.anki).length;
+                    const scheduled = app.data.filter(i => i.date).length;
+
+                    // Compute Difficulty Distro
+                    const diffCounts = [0,0,0,0,0,0,0];
+                    app.data.forEach(i => diffCounts[i.diff]++);
+
+                    container.innerHTML = `
+                        <!-- KPIs -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Completed</span>
+                                <div class="text-3xl font-bold text-slate-800 mt-2">${done} <span class="text-sm text-slate-400 font-medium">/ ${total}</span></div>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Anki Cards</span>
+                                <div class="text-3xl font-bold text-sky-600 mt-2">${anki}</div>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Scheduled</span>
+                                <div class="text-3xl font-bold text-indigo-500 mt-2">${scheduled}</div>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Unrated Topics</span>
+                                <div class="text-3xl font-bold text-slate-400 mt-2">${diffCounts[0]}</div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Area -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 class="font-bold text-slate-800 mb-6">Subject Difficulty Heatmap</h3>
+                                <div class="chart-wrapper">
+                                    <canvas id="chartDiff"></canvas>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 class="font-bold text-slate-800 mb-6">Resource Progress</h3>
+                                <div class="chart-wrapper">
+                                    <canvas id="chartSource"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Render Charts (Async to allow DOM paint)
+                    setTimeout(() => {
+                        // 1. Difficulty Chart
+                        new Chart(document.getElementById('chartDiff'), {
+                            type: 'bar',
+                            data: {
+                                labels: ['Unrated', 'V.Easy', 'Easy', 'Good', 'Medium', 'Hard', 'V.Hard'],
+                                datasets: [{
+                                    label: 'Topics',
+                                    data: diffCounts,
+                                    backgroundColor: ['#e2e8f0', '#15803d', '#4ade80', '#facc15', '#fb923c', '#ef4444', '#7f1d1d'],
+                                    borderRadius: 4
+                                }]
+                            },
+                            options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                        });
+
+                        // 2. Source Progress Chart
+                        const sources = { 'BnB': {total:0, done:0}, 'Sketchy': {total:0, done:0}, 'FA': {total:0, done:0} };
+                        app.data.forEach(i => {
+                            if(sources[i.source]) {
+                                sources[i.source].total++;
+                                if(i.done) sources[i.source].done++;
+                            }
+                        });
+
+                        new Chart(document.getElementById('chartSource'), {
+                            type: 'doughnut',
+                            data: {
+                                labels: ['B&B', 'Sketchy', 'First Aid'],
+                                datasets: [{
+                                    data: [sources.BnB.done, sources.Sketchy.done, sources.FA.done],
+                                    backgroundColor: ['#3b82f6', '#8b5cf6', '#10b981'],
+                                    borderWidth: 0
+                                }, {
+                                    data: [sources.BnB.total-sources.BnB.done, sources.Sketchy.total-sources.Sketchy.done, sources.FA.total-sources.FA.done],
+                                    backgroundColor: ['#dbeafe', '#f3e8ff', '#d1fae5'],
+                                    borderWidth: 0,
+                                    weight: 0.5
+                                }]
+                            },
+                            options: { maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } }
+                        });
+                    }, 50);
+                },
+
+                // LIST VIEW (BnB, Sketchy, FA)
+                list: (container, source) => {
+                    const titles = { 'bnb': 'Boards & Beyond', 'sketchy': 'Sketchy Micro', 'fa': 'First Aid Checklist' };
+                    const filters = { 'bnb': 'BnB', 'sketchy': 'Sketchy', 'fa': 'FA' };
+                    
+                    document.getElementById('pageTitle').innerText = titles[source];
+                    container.className = 'p-8 overflow-y-auto custom-scroll fade-in h-full';
+
+                    const items = app.data.filter(i => i.source === filters[source]);
+                    // Group by Category
+                    const groups = {};
+                    items.forEach(i => {
+                        if (!groups[i.cat]) groups[i.cat] = [];
+                        groups[i.cat].push(i);
+                    });
+
+                    // Difficulty Dropdown HTML Helper
+                    const diffMenu = (item) => `
+                        <div class="relative group">
+                            <button class="w-6 h-6 rounded-full border shadow-sm transition-transform hover:scale-110 diff-${item.diff}"></button>
+                            <div class="absolute right-0 top-8 bg-white border border-slate-200 p-2 rounded-lg shadow-xl hidden group-hover:flex gap-1 z-50 w-max">
+                                ${[1,2,3,4,5,6].map(l => 
+                                    `<button onclick="app.actions.setDiff('${item.id}', ${l})" class="w-5 h-5 rounded-full diff-${l} hover:scale-125 transition-transform" title="${DIFF_LABELS[l]}"></button>`
+                                ).join('')}
+                                <button onclick="app.actions.setDiff('${item.id}', 0)" class="w-5 h-5 rounded-full diff-0 hover:scale-125 text-[8px] flex items-center justify-center text-slate-500">X</button>
+                            </div>
+                        </div>
+                    `;
+
+                    let html = `<div class="max-w-5xl mx-auto space-y-6">`;
+                    if(items.length === 0) html += `<div class="text-center text-slate-400 mt-10">No items found in this category.</div>`;
+                    
+                    for (const [cat, catItems] of Object.entries(groups)) {
+                        html += `
+                            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                                <div class="bg-slate-50 px-6 py-3 border-b border-slate-100 flex justify-between items-center">
+                                    <h3 class="font-bold text-slate-700">${cat}</h3>
+                                    <span class="text-xs bg-slate-200 text-slate-600 px-2 py-1 rounded-full">${catItems.length} items</span>
+                                </div>
+                                <div class="divide-y divide-slate-100">
+                                    ${catItems.map(item => `
+                                        <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors group">
+                                            <div class="flex items-center gap-4">
+                                                <input type="checkbox" onchange="app.actions.toggleDone('${item.id}')" ${item.done ? 'checked' : ''} 
+                                                    class="w-5 h-5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 cursor-pointer">
+                                                <div class="${item.done ? 'opacity-50 line-through grayscale' : ''} transition-all">
+                                                    <div class="font-medium text-slate-800">${item.title}</div>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-4 opacity-40 group-hover:opacity-100 transition-opacity">
+                                                <div class="flex flex-col items-center">
+                                                    <span class="text-[9px] uppercase font-bold text-slate-400 mb-1">Rank</span>
+                                                    ${diffMenu(item)}
+                                                </div>
+                                                <div class="w-px h-8 bg-slate-200 mx-2"></div>
+                                                <div class="flex flex-col items-center">
+                                                    <span class="text-[9px] uppercase font-bold text-slate-400 mb-1">Anki</span>
+                                                    <button onclick="app.actions.toggleAnki('${item.id}')" class="px-3 py-1 text-xs rounded border ${item.anki ? 'bg-sky-100 text-sky-700 border-sky-200 font-bold' : 'bg-white text-slate-400 border-slate-200 hover:border-sky-300'} transition-all">
+                                                        ${item.anki ? 'Done' : 'ToDo'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    html += `</div>`;
+                    container.innerHTML = html;
+                },
+
+                // PLANNER VIEW (GANTT/CALENDAR)
+                planner: (container) => {
+                    document.getElementById('pageTitle').innerText = '2026 Planner';
+                    container.className = 'flex flex-col h-full bg-slate-100 fade-in';
+                    
+                    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                    
+                    // Layout
+                    container.innerHTML = `
+                        <div class="flex h-full">
+                            <!-- Backlog Sidebar -->
+                            <div class="w-72 bg-white border-r border-slate-200 flex flex-col z-10 shadow-lg">
+                                <div class="p-4 border-b border-slate-200 bg-slate-50">
+                                    <h3 class="font-bold text-slate-700 text-sm">Unscheduled Tasks</h3>
+                                </div>
+                                <div class="flex-grow overflow-y-auto custom-scroll p-3 space-y-2" id="backlog-list">
+                                    <!-- Draggables injected here -->
+                                </div>
+                            </div>
+
+                            <!-- Calendar Grid -->
+                            <div class="flex-grow flex flex-col">
+                                <div class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6">
+                                    <button onclick="app.actions.changeMonth(-1)" class="p-2 hover:bg-slate-100 rounded text-slate-600 font-bold">← Prev</button>
+                                    <h2 class="text-lg font-bold text-slate-800">${months[app.state.month]} ${app.state.year}</h2>
+                                    <button onclick="app.actions.changeMonth(1)" class="p-2 hover:bg-slate-100 rounded text-slate-600 font-bold">Next →</button>
+                                </div>
+                                <div class="grid grid-cols-7 text-center py-2 bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-400 uppercase">
+                                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                                </div>
+                                <div class="flex-grow overflow-y-auto custom-scroll">
+                                    <div id="calendar-grid" class="grid grid-cols-7 min-h-full auto-rows-fr">
+                                        <!-- Days injected here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Populate Backlog
+                    const backlogEl = document.getElementById('backlog-list');
+                    const unscheduled = app.data.filter(i => !i.date && !i.done);
+                    
+                    if(unscheduled.length === 0) backlogEl.innerHTML = `<div class="text-center text-xs text-slate-400 mt-4">All tasks scheduled or done!</div>`;
+                    
+                    backlogEl.innerHTML = unscheduled.map(item => `
+                        <div draggable="true" ondragstart="app.drag.start(event)" id="${item.id}"
+                             class="draggable-item bg-white border border-slate-200 p-2 rounded shadow-sm hover:border-sky-400 hover:shadow-md transition-all group mb-2 border-l-4 diff-${item.diff}">
+                            <div class="flex justify-between items-start">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">${item.source}</span>
+                            </div>
+                            <div class="text-xs font-bold text-slate-700 mt-1 leading-tight">${item.title}</div>
+                        </div>
+                    `).join('');
+
+                    // Populate Calendar
+                    const gridEl = document.getElementById('calendar-grid');
+                    const firstDay = new Date(app.state.year, app.state.month, 1).getDay();
+                    const daysInMonth = new Date(app.state.year, app.state.month + 1, 0).getDate();
+                    
+                    let calHtml = '';
+                    // Blanks
+                    for(let i=0; i<firstDay; i++) calHtml += `<div class="bg-slate-50 border-b border-r border-slate-200"></div>`;
+                    
+                    // Days
+                    for(let d=1; d<=daysInMonth; d++) {
+                        const dateStr = `${app.state.year}-${String(app.state.month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                        const dayTasks = app.data.filter(i => i.date === dateStr);
+                        
+                        calHtml += `
+                            <div class="droppable-day bg-white border-b border-r border-slate-200 p-1 flex flex-col gap-1 relative group"
+                                 ondrop="app.drag.drop(event, '${dateStr}')" 
+                                 ondragover="app.drag.allow(event)"
+                                 ondragleave="app.drag.leave(event)">
+                                <span class="text-xs font-bold text-slate-400 ml-1 mt-1">${d}</span>
+                                ${dayTasks.map(t => `
+                                    <div draggable="true" ondragstart="app.drag.start(event)" id="${t.id}"
+                                         class="bg-sky-50 border border-sky-200 p-1 rounded text-[10px] text-sky-900 font-medium cursor-grab shadow-sm flex justify-between items-center group/item hover:bg-white hover:border-sky-400 transition-colors">
+                                        <span class="truncate">${t.title}</span>
+                                        <button onclick="app.actions.unschedule('${t.id}')" class="text-red-400 font-bold px-1 hover:text-red-600 hidden group-hover/item:block">×</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                    gridEl.innerHTML = calHtml;
+                }
+            },
+
+            // --- 4. ACTIONS & INTERACTIONS ---
+            actions: {
+                toggleDone: (id) => {
+                    const i = app.data.find(x => x.id === id);
+                    if(i) { i.done = !i.done; app.save(); app.navigate(app.state.view); }
+                },
+                toggleAnki: (id) => {
+                    const i = app.data.find(x => x.id === id);
+                    if(i) { i.anki = !i.anki; app.save(); app.navigate(app.state.view); }
+                },
+                setDiff: (id, lvl) => {
+                    const i = app.data.find(x => x.id === id);
+                    if(i) { i.diff = lvl; app.save(); app.navigate(app.state.view); }
+                },
+                changeMonth: (delta) => {
+                    app.state.month += delta;
+                    if(app.state.month > 11) { app.state.month = 0; app.state.year++; }
+                    if(app.state.month < 0) { app.state.month = 11; app.state.year--; }
+                    app.navigate('planner');
+                },
+                unschedule: (id) => {
+                    const i = app.data.find(x => x.id === id);
+                    if(i) { i.date = null; app.save(); app.navigate('planner'); }
+                }
+            },
+
+            // --- 5. DRAG AND DROP UTILS ---
+            drag: {
+                start: (ev) => {
+                    ev.dataTransfer.setData("text/plain", ev.target.id);
+                    ev.effectAllowed = "move";
+                    ev.target.style.opacity = '0.5';
+                },
+                allow: (ev) => {
+                    ev.preventDefault();
+                    ev.currentTarget.classList.add('drag-over');
+                },
+                leave: (ev) => {
+                    ev.currentTarget.classList.remove('drag-over');
+                },
+                drop: (ev, dateStr) => {
+                    ev.preventDefault();
+                    ev.currentTarget.classList.remove('drag-over');
+                    const id = ev.dataTransfer.getData("text/plain");
+                    const item = app.data.find(i => i.id === id);
+                    if(item) {
+                        item.date = dateStr;
+                        app.save();
+                        app.navigate('planner');
+                    }
+                }
+            },
+
+            // --- 6. UTILITIES ---
+            updateGlobalStats: () => {
+                const total = app.data.length;
+                const done = app.data.filter(i => i.done).length;
+                const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+                document.getElementById('totalProgress').innerText = pct;
+                document.getElementById('progressBar').style.width = `${pct}%`;
+            },
+
+            // Data Export/Import
+            exportData: () => {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(app.data));
+                const node = document.createElement('a');
+                node.setAttribute("href", dataStr);
+                node.setAttribute("download", `usmle_tracker_backup_${new Date().toISOString().slice(0,10)}.json`);
+                document.body.appendChild(node);
+                node.click();
+                node.remove();
+            },
+
+            importData: (input) => {
+                const file = input.files[0];
+                if(!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const json = JSON.parse(e.target.result);
+                        if(Array.isArray(json)) {
+                            app.data = json;
+                            app.save();
+                            app.init();
+                            alert("Data imported successfully!");
+                        } else {
+                            alert("Invalid file format.");
+                        }
+                    } catch(err) {
+                        alert("Error reading file.");
+                    }
+                };
+                reader.readAsText(file);
+            }
+        };
+
+        // Boot
+        document.addEventListener('DOMContentLoaded', app.init);
+    </script>
+</body>
+</html>
