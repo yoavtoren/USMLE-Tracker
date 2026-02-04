@@ -4,52 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>USMLE Step 1 Master Ecosystem</title>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
-        /* Base Styles */
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        
-        /* Custom Scrollbar */
         .custom-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
-
-        /* Chart Containers */
         .chart-wrapper { position: relative; height: 260px; width: 100%; }
-
-        /* Difficulty Colors (0-6) */
-        .diff-0 { background-color: #e2e8f0; border-color: #cbd5e1; } /* Unrated */
-        .diff-1 { background-color: #15803d; border-color: #14532d; color: white; } /* Very Easy */
-        .diff-2 { background-color: #4ade80; border-color: #16a34a; color: #064e3b; } /* Easy */
-        .diff-3 { background-color: #facc15; border-color: #ca8a04; color: #713f12; } /* Good */
-        .diff-4 { background-color: #fb923c; border-color: #ea580c; color: #7c2d12; } /* Medium */
-        .diff-5 { background-color: #ef4444; border-color: #b91c1c; color: white; } /* Hard */
-        .diff-6 { background-color: #7f1d1d; border-color: #450a0a; color: white; } /* Very Hard */
-
-        /* Planner Drag & Drop */
+        .diff-0 { background-color: #e2e8f0; border-color: #cbd5e1; }
+        .diff-1 { background-color: #15803d; border-color: #14532d; color: white; }
+        .diff-2 { background-color: #4ade80; border-color: #16a34a; color: #064e3b; }
+        .diff-3 { background-color: #facc15; border-color: #ca8a04; color: #713f12; }
+        .diff-4 { background-color: #fb923c; border-color: #ea580c; color: #7c2d12; }
+        .diff-5 { background-color: #ef4444; border-color: #b91c1c; color: white; }
+        .diff-6 { background-color: #7f1d1d; border-color: #450a0a; color: white; }
         .droppable-day { min-height: 100px; transition: all 0.2s; }
         .droppable-day.drag-over { background-color: #e0f2fe; box-shadow: inset 0 0 0 2px #3b82f6; }
         .draggable-item { cursor: grab; user-select: none; }
-        .draggable-item:active { cursor: grabbing; opacity: 0.8; }
-
-        /* Animations */
         .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="h-screen flex overflow-hidden text-slate-800 bg-slate-50">
 
-    <!-- SIDEBAR NAVIGATION -->
     <aside class="w-72 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col z-20 shadow-xl">
         <div class="p-6 border-b border-slate-800">
             <h1 class="text-xl font-bold text-white tracking-tight">USMLE<span class="text-sky-500">Master</span></h1>
@@ -57,31 +36,25 @@
         </div>
         
         <nav class="flex-grow p-4 space-y-1 overflow-y-auto custom-scroll">
-            <button onclick="app.navigate('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all active-nav">
+            <button onclick="app.navigate('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all">
                 <span class="mr-3 text-lg">📊</span> Home Dashboard
             </button>
-            
             <div class="pt-6 pb-2 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Core Resources</div>
-            
             <button onclick="app.navigate('bnb_dashboard')" id="nav-bnb_dashboard" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all">
                 <span class="mr-3 text-lg">🎬</span> B&B Library
             </button>
-
             <button onclick="app.navigate('fa_dashboard')" id="nav-fa_dashboard" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all">
                 <span class="mr-3 text-lg">📘</span> First Aid Library
             </button>
-            
             <button onclick="app.navigate('sketchy')" id="nav-sketchy" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all">
                 <span class="mr-3 text-lg">🦠</span> Sketchy Micro
             </button>
-
             <div class="pt-6 pb-2 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Strategy</div>
-            
             <button onclick="app.navigate('planner')" id="nav-planner" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-white transition-all">
                 <span class="mr-3 text-lg">📅</span> 2026 Planner
             </button>
             
-            <div class="mt-auto pt-6">
+            <div class="mt-auto pt-6 space-y-1">
                 <button onclick="app.exportData()" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-sky-400 transition-all text-sm">
                     <span class="mr-3">💾</span> Backup Data
                 </button>
@@ -89,19 +62,17 @@
                     <span class="mr-3">📂</span> Import Data
                     <input type="file" onchange="app.importData(this)" class="hidden" accept=".json">
                 </label>
+                <button onclick="app.actions.hardReset()" class="nav-item w-full flex items-center p-3 rounded-lg hover:bg-red-900/30 hover:text-red-400 transition-all text-sm">
+                    <span class="mr-3">🔄</span> Reset to Defaults
+                </button>
             </div>
         </nav>
     </aside>
 
-    <!-- MAIN CONTENT AREA -->
     <main class="flex-grow flex flex-col h-full overflow-hidden relative">
-        
-        <!-- HEADER -->
         <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shadow-sm z-10">
             <h2 id="pageTitle" class="text-xl font-bold text-slate-800">Overview</h2>
-            
             <div class="flex items-center gap-6">
-                <!-- Global Stats -->
                 <div class="flex items-center gap-3">
                     <div class="text-right">
                         <div class="text-xs text-slate-500 font-medium uppercase">Global Mastery</div>
@@ -113,949 +84,234 @@
                 </div>
             </div>
         </header>
-
-        <!-- DYNAMIC VIEWPORT -->
-        <div id="viewport" class="flex-grow overflow-hidden relative bg-slate-50/50">
-            <!-- Views are injected here -->
-        </div>
-
+        <div id="viewport" class="flex-grow overflow-hidden relative bg-slate-50/50"></div>
     </main>
 
-    <!-- JAVASCRIPT APP LOGIC -->
     <script>
-        // --- 1. CONFIGURATION & DATA ---
-        
         const DIFF_LABELS = { 1: "Very Easy", 2: "Easy", 3: "Good", 4: "Medium", 5: "Hard", 6: "Very Hard" };
         const uid = () => Math.random().toString(36).substr(2, 9);
 
-        // --- FIRST AID CURRICULUM DATA (Based on input) ---
         const FA_RAW = [
-            // Biochem
             ["01 Biochem", "01 Molecular", "Chromatin structure"], ["01 Biochem", "01 Molecular", "Nucleotides"], ["01 Biochem", "01 Molecular", "DNA replication"], ["01 Biochem", "01 Molecular", "Mutations in DNA"], ["01 Biochem", "01 Molecular", "DNA repair"], ["01 Biochem", "01 Molecular", "Regulation of gene expression"], ["01 Biochem", "01 Molecular", "Protein synthesis"],
             ["01 Biochem", "02 Cellular", "Cell cycle phases"], ["01 Biochem", "02 Cellular", "Rough/Smooth ER"], ["01 Biochem", "02 Cellular", "Cell trafficking"], ["01 Biochem", "02 Cellular", "Cytoskeletal elements"], ["01 Biochem", "02 Cellular", "Collagen & Elastin"],
             ["01 Biochem", "03 Lab Techniques", "PCR"], ["01 Biochem", "03 Lab Techniques", "CRISPR/Cas9"], ["01 Biochem", "03 Lab Techniques", "Blotting procedures"], ["01 Biochem", "03 Lab Techniques", "Flow cytometry"], ["01 Biochem", "03 Lab Techniques", "ELISA"],
             ["01 Biochem", "04 Genetics", "Hardy-Weinberg"], ["01 Biochem", "04 Genetics", "Imprinting"], ["01 Biochem", "04 Genetics", "Modes of inheritance"], ["01 Biochem", "04 Genetics", "Cystic fibrosis"], ["01 Biochem", "04 Genetics", "Trinucleotide repeats"], ["01 Biochem", "04 Genetics", "Down/Edwards/Patau"],
             ["01 Biochem", "05 Nutrition", "Vitamins: Fat Soluble"], ["01 Biochem", "05 Nutrition", "Vitamins: Water Soluble"], ["01 Biochem", "05 Nutrition", "Ethanol metabolism"],
             ["01 Biochem", "06 Metabolism", "Glycolysis regulation"], ["01 Biochem", "06 Metabolism", "Gluconeogenesis"], ["01 Biochem", "06 Metabolism", "TCA Cycle"], ["01 Biochem", "06 Metabolism", "Electron transport chain"], ["01 Biochem", "06 Metabolism", "HMP Shunt"], ["01 Biochem", "06 Metabolism", "Urea cycle"], ["01 Biochem", "06 Metabolism", "Glycogen storage diseases"], ["01 Biochem", "06 Metabolism", "Lysosomal storage diseases"], ["01 Biochem", "06 Metabolism", "Fatty acid metabolism"], ["01 Biochem", "06 Metabolism", "Familial dyslipidemias"],
-
-            // Immuno
             ["02 Immunology", "01 Lymphoid Structures", "Lymph node & Spleen"], ["02 Immunology", "01 Lymphoid Structures", "Thymus"],
             ["02 Immunology", "02 Cellular", "Innate vs adaptive"], ["02 Immunology", "02 Cellular", "MHC I & II"], ["02 Immunology", "02 Cellular", "T- & B-cell activation"],
             ["02 Immunology", "03 Immune Responses", "Antibody structure"], ["02 Immunology", "03 Immune Responses", "Complement"], ["02 Immunology", "03 Immune Responses", "Cytokines"], ["02 Immunology", "03 Immune Responses", "Hypersensitivity types"], ["02 Immunology", "03 Immune Responses", "Transplant rejection"], ["02 Immunology", "03 Immune Responses", "Immunodeficiencies"],
             ["02 Immunology", "04 Immunosuppressants", "Immunosuppressants"],
-
-            // Micro
             ["03 Micro", "01 Basic Bacteriology", "Bacterial structures"], ["03 Micro", "01 Basic Bacteriology", "Gram Stains"], ["03 Micro", "01 Basic Bacteriology", "Exotoxins vs Endotoxins"],
             ["03 Micro", "02 Clinical Bacteriology", "Gram-positive cocci (Staph/Strep)"], ["03 Micro", "02 Clinical Bacteriology", "Gram-positive rods"], ["03 Micro", "02 Clinical Bacteriology", "Gram-negatives"], ["03 Micro", "02 Clinical Bacteriology", "Mycobacteria"], ["03 Micro", "02 Clinical Bacteriology", "Spirochetes"], ["03 Micro", "02 Clinical Bacteriology", "Zoonotics"],
             ["03 Micro", "03 Mycology", "Systemic mycoses"], ["03 Micro", "03 Mycology", "Cutaneous mycoses"], ["03 Micro", "03 Mycology", "Opportunistic fungi"],
             ["03 Micro", "04 Parasitology", "Protozoa"], ["03 Micro", "04 Parasitology", "Helminths"],
             ["03 Micro", "05 Virology", "DNA Viruses"], ["03 Micro", "05 Virology", "RNA Viruses"], ["03 Micro", "05 Virology", "Retroviruses (HIV)"], ["03 Micro", "05 Virology", "Hepatitis"],
             ["03 Micro", "07 Antimicrobials", "Penicillins"], ["03 Micro", "07 Antimicrobials", "Cephalosporins"], ["03 Micro", "07 Antimicrobials", "Protein synthesis inhibitors"], ["03 Micro", "07 Antimicrobials", "Antifungals"], ["03 Micro", "07 Antimicrobials", "Antivirals"],
-
-            // Pathology
             ["04 Pathology", "01 Cellular Injury", "Apoptosis vs Necrosis"], ["04 Pathology", "01 Cellular Injury", "Free radical injury"], ["04 Pathology", "01 Cellular Injury", "Amyloidosis"],
             ["04 Pathology", "02 Inflammation", "Acute vs Chronic"], ["04 Pathology", "02 Inflammation", "Granulomatous inflammation"], ["04 Pathology", "02 Inflammation", "Wound healing"],
             ["04 Pathology", "03 Neoplasia", "Oncogenes vs Tumor Suppressors"], ["04 Pathology", "03 Neoplasia", "Tumor markers"], ["04 Pathology", "03 Neoplasia", "Metastasis"],
-
-            // Pharm
             ["05 Pharm", "01 PK/PD", "Pharmacokinetics"], ["05 Pharm", "01 PK/PD", "Pharmacodynamics"],
             ["05 Pharm", "02 Autonomic", "Cholinergics/Anticholinergics"], ["05 Pharm", "02 Autonomic", "Sympathomimetics/lytics"],
             ["05 Pharm", "03 Toxicities", "P450 Interactions"], ["05 Pharm", "03 Toxicities", "Antidotes"],
-
-            // Public Health
             ["06 Public Health", "01 Epi/Bio", "Study Designs"], ["06 Public Health", "01 Epi/Bio", "Bias"], ["06 Public Health", "01 Epi/Bio", "Statistical Tests"],
             ["06 Public Health", "02 Ethics", "Core Ethical Principles"], ["06 Public Health", "02 Ethics", "Informed Consent"],
             ["06 Public Health", "05 Quality", "Root Cause Analysis"], ["06 Public Health", "05 Quality", "Medical Errors"],
-
-            // Cardio
             ["07 Cardio", "01 Embryology", "Heart Morphogenesis"], ["07 Cardio", "03 Physiology", "Cardiac Output"], ["07 Cardio", "03 Physiology", "PV Loops"], ["07 Cardio", "03 Physiology", "Wiggers Diagram"], ["07 Cardio", "04 Pathology", "Congenital Heart Disease"], ["07 Cardio", "04 Pathology", "Ischemic Heart Disease"], ["07 Cardio", "04 Pathology", "Heart Failure"], ["07 Cardio", "04 Pathology", "Valvular Disease"], ["07 Cardio", "04 Pathology", "Cardiomyopathies"], ["07 Cardio", "05 Pharm", "Antihypertensives"], ["07 Cardio", "05 Pharm", "Antiarrhythmics"],
-
-            // Endocrine
             ["08 Endocrine", "03 Physiology", "HPA Axis"], ["08 Endocrine", "03 Physiology", "Insulin/Glucagon"], ["08 Endocrine", "04 Pathology", "Diabetes Mellitus"], ["08 Endocrine", "04 Pathology", "Thyroid Disease"], ["08 Endocrine", "04 Pathology", "Adrenal Disorders"], ["08 Endocrine", "05 Pharm", "Diabetes Drugs"], ["08 Endocrine", "05 Pharm", "Thyroid Drugs"],
-
-            // GI
             ["09 GI", "02 Anatomy", "Blood Supply"], ["09 GI", "03 Physiology", "GI Secretions"], ["09 GI", "04 Pathology", "Esophageal Disorders"], ["09 GI", "04 Pathology", "Peptic Ulcer Disease"], ["09 GI", "04 Pathology", "IBD"], ["09 GI", "04 Pathology", "Cirrhosis"], ["09 GI", "04 Pathology", "Pancreatitis"], ["09 GI", "05 Pharm", "GI Pharmacology"],
-
-            // Heme Onc
             ["10 Heme Onc", "03 Physiology", "Coagulation Cascade"], ["10 Heme Onc", "04 Pathology", "Microcytic Anemias"], ["10 Heme Onc", "04 Pathology", "Leukemias"], ["10 Heme Onc", "04 Pathology", "Lymphomas"], ["10 Heme Onc", "04 Pathology", "Bleeding Disorders"], ["10 Heme Onc", "05 Pharm", "Anticoagulants"], ["10 Heme Onc", "05 Pharm", "Chemotherapy"],
-
-            // MSK
             ["11 MSK", "01 Anatomy", "Brachial Plexus"], ["11 MSK", "02 Pathology", "Fractures"], ["11 MSK", "02 Pathology", "Osteoporosis"], ["11 MSK", "02 Pathology", "Rheumatoid vs Osteoarthritis"], ["11 MSK", "03 Derm", "Skin Cancer"], ["11 MSK", "03 Derm", "Blistering Disorders"],
-
-            // Neuro
             ["12 Neuro", "02 Anatomy", "Cranial Nerves"], ["12 Neuro", "02 Anatomy", "Spinal Tracts"], ["12 Neuro", "03 Pathology", "Stroke"], ["12 Neuro", "03 Pathology", "Seizures"], ["12 Neuro", "03 Pathology", "Demyelinating Disease"], ["12 Neuro", "03 Pathology", "Brain Tumors"], ["12 Neuro", "05 Ophthalmology", "Visual Fields"], ["12 Neuro", "06 Pharm", "Anesthetics"],
-
-            // Psych
             ["13 Psychiatry", "02 Pathology", "Mood Disorders"], ["13 Psychiatry", "02 Pathology", "Psychotic Disorders"], ["13 Psychiatry", "02 Pathology", "Anxiety Disorders"], ["13 Psychiatry", "02 Pathology", "Substance Abuse"], ["13 Psychiatry", "03 Pharm", "Antidepressants"], ["13 Psychiatry", "03 Pharm", "Antipsychotics"],
-
-            // Renal
             ["14 Renal", "03 Physiology", "GFR & Clearance"], ["14 Renal", "03 Physiology", "Acid-Base"], ["14 Renal", "03 Physiology", "Electrolytes"], ["14 Renal", "04 Pathology", "Nephritic Syndrome"], ["14 Renal", "04 Pathology", "Nephrotic Syndrome"], ["14 Renal", "04 Pathology", "Acute Kidney Injury"], ["14 Renal", "05 Pharm", "Diuretics"],
-
-            // Repro
             ["15 Repro", "03 Physiology", "Menstrual Cycle"], ["15 Repro", "03 Physiology", "Pregnancy"], ["15 Repro", "04 Pathology", "PCOS"], ["15 Repro", "04 Pathology", "Ovarian/Testicular Tumors"], ["15 Repro", "04 Pathology", "Breast Pathology"],
-
-            // Resp
             ["16 Respiratory", "03 Physiology", "Lung Volumes"], ["16 Respiratory", "03 Physiology", "V/Q Mismatch"], ["16 Respiratory", "04 Pathology", "Obstructive Lung Disease"], ["16 Respiratory", "04 Pathology", "Restrictive Lung Disease"], ["16 Respiratory", "04 Pathology", "Pneumonia"], ["16 Respiratory", "04 Pathology", "Lung Cancer"]
         ];
 
-        // --- B&B CURRICULUM DATA (Existing) ---
-        const BNB_CURRICULUM = [
-    { c: '1. Basic Pharmacology', t: 'General Topics' },
-    { c: '2. Behavioral Science', t: 'General Topics' },
-    { c: '3. Biochemistry', t: 'Metabolism & Molecular' },
-    { c: '4. Biostats/Epi', t: 'Biostatistics & Epidemiology' },
-    { c: '5. Cardiology', t: 'Cardiac Medicine' },
-    { c: '6. Cell Biology', t: 'Molecular & Cellular Biology' },
-    { c: '7. Dermatology', t: 'Skin Disorders' },
-    { c: '8. Endocrinology', t: 'Thyroid, Adrenal & Pancreas' },
-    { c: '9. Gastroenterology', t: 'Clinical GI & Anatomy' },
-    { c: '10. Genetics', t: 'Genetic Concepts & Disorders' },
-    { c: '11. Hematology', t: 'Hemostasis & RBC/WBC Disorders' },
-    { c: '12. Immunology', t: 'Basic & Clinical Immunology' },
-    { c: '13. Infectious Disease', t: 'Bacteria, Viruses & Antibiotics' },
-    { c: '14. Musculoskeletal', t: 'Anatomy & Pathology' },
-    { c: '15. Neurology', t: 'Neurovascular & ANS' },
-    { c: '16. Pathology', t: 'General Pathology' },
-    { c: '17. Psychiatry', t: 'Psychology & Pathology' },
-    { c: '18. Pulmonary', t: 'Pulmonary Medicine' },
-    { c: '19. Renal', t: 'Renal Medicine & Acid-Base' },
-    { c: '20. Reproductive', t: 'Embryology & Pregnancy' }
-];;
-
-        // Generator
         const generateSeedData = () => {
             let items = [];
-            
-            // 1. Boards & Beyond
-            // Re-adding the detailed B&B list from previous context to ensure consistency
             const bnb_detailed = [
-  // 1. Basic Pharmacology
-  { c: '1. Basic Pharmacology', t: 'Enzymes' },
-  { c: '1. Basic Pharmacology', t: 'Enzyme Inhibitors' },
-  { c: '1. Basic Pharmacology', t: 'Dose-Response' },
-  { c: '1. Basic Pharmacology', t: 'Drug Elimination' },
-  { c: '1. Basic Pharmacology', t: 'Pharmacokinetics' },
-
-  // 2. Behavioral Science
-  { c: '2. Behavioral Science', t: 'Ethics Principles' },
-  { c: '2. Behavioral Science', t: 'Informed Consent' },
-  { c: '2. Behavioral Science', t: 'Confidentiality' },
-  { c: '2. Behavioral Science', t: 'Decision-Making Capacity' },
-  { c: '2. Behavioral Science', t: 'Public Health' },
-  { c: '2. Behavioral Science', t: 'Quality and Safety' },
-  { c: '2. Behavioral Science', t: 'The Healthy Patient' },
-  { c: '2. Behavioral Science', t: 'Geriatrics' },
-  { c: '2. Behavioral Science', t: 'Pediatrics' },
-
-  // 3. Biochemistry
-  { c: '3. Biochemistry', t: 'DNA Structure' },
-  { c: '3. Biochemistry', t: 'Purine Metabolism' },
-  { c: '3. Biochemistry', t: 'Pyrimidine Metabolism' },
-  { c: '3. Biochemistry', t: 'Glucose' },
-  { c: '3. Biochemistry', t: 'Glycolysis' },
-  { c: '3. Biochemistry', t: 'Gluconeogenesis' },
-  { c: '3. Biochemistry', t: 'Glycogen' },
-  { c: '3. Biochemistry', t: 'HMP Shunt' },
-  { c: '3. Biochemistry', t: 'Fructose and Galactose' },
-  { c: '3. Biochemistry', t: 'Pyruvate Dehydrogenase' },
-  { c: '3. Biochemistry', t: 'TCA Cycle' },
-  { c: '3. Biochemistry', t: 'Electron Transport Chain' },
-  { c: '3. Biochemistry', t: 'Fatty Acids' },
-  { c: '3. Biochemistry', t: 'Ketone Bodies' },
-  { c: '3. Biochemistry', t: 'Ethanol Metabolism' },
-  { c: '3. Biochemistry', t: 'Exercise and Starvation' },
-  { c: '3. Biochemistry', t: 'Inborn Errors of Metabolism' },
-  { c: '3. Biochemistry', t: 'Amino Acids' },
-  { c: '3. Biochemistry', t: 'Phenylalanine and Tyrosine' },
-  { c: '3. Biochemistry', t: 'Other Amino Acids' },
-  { c: '3. Biochemistry', t: 'Ammonia' },
-  { c: '3. Biochemistry', t: 'B Vitamins' },
-  { c: '3. Biochemistry', t: 'B12 and Folate' },
-  { c: '3. Biochemistry', t: 'Other Vitamins' },
-  { c: '3. Biochemistry', t: 'Lipid Metabolism' },
-  { c: '3. Biochemistry', t: 'Hyperlipidemia' },
-  { c: '3. Biochemistry', t: 'Lipid Drugs' },
-  { c: '3. Biochemistry', t: 'Lysosomal Storage Diseases' },
-
-  // 4. Biostats/Epi
-  { c: '4. Biostats/Epi', t: 'Basic Statistics' },
-  { c: '4. Biostats/Epi', t: 'Hypothesis Testing' },
-  { c: '4. Biostats/Epi', t: 'Tests of Significance' },
-  { c: '4. Biostats/Epi', t: 'Correlations' },
-  { c: '4. Biostats/Epi', t: 'Study Designs' },
-  { c: '4. Biostats/Epi', t: 'Risk Quantification' },
-  { c: '4. Biostats/Epi', t: 'Sensitivity and Specificity' },
-  { c: '4. Biostats/Epi', t: 'Positive and Negative Predictive Value' },
-  { c: '4. Biostats/Epi', t: 'Diagnostic Tests' },
-  { c: '4. Biostats/Epi', t: 'Bias' },
-  { c: '4. Biostats/Epi', t: 'Clinical Trials' },
-  { c: '4. Biostats/Epi', t: 'Evidence-based Medicine' },
-
-  // 5. Cardiology
-  { c: '5. Cardiology', t: 'Cardiac Anatomy' },
-  { c: '5. Cardiology', t: 'Cardiac Physiology' },
-  { c: '5. Cardiology', t: 'CV Response to Exercise' },
-  { c: '5. Cardiology', t: 'Blood Flow Mechanics' },
-  { c: '5. Cardiology', t: 'Regulation of Blood Pressure' },
-  { c: '5. Cardiology', t: 'PV Loops' },
-  { c: '5. Cardiology', t: 'Wiggers’ Diagram' },
-  { c: '5. Cardiology', t: 'Venous Pressure Tracings' },
-  { c: '5. Cardiology', t: 'Starling Curve' },
-  { c: '5. Cardiology', t: 'Atherosclerosis' },
-  { c: '5. Cardiology', t: 'Cardiac Ischemia' },
-  { c: '5. Cardiology', t: 'STEMI' },
-  { c: '5. Cardiology', t: 'Unstable Angina/NSTEMI' },
-  { c: '5. Cardiology', t: 'Stable Angina' },
-  { c: '5. Cardiology', t: 'EKG Basics' },
-  { c: '5. Cardiology', t: 'High Yield EKGs' },
-  { c: '5. Cardiology', t: 'Cardiac Action Potentials' },
-  { c: '5. Cardiology', t: 'AV and Bundle Branch Blocks' },
-  { c: '5. Cardiology', t: 'Atrial Fibrillation and Flutter' },
-  { c: '5. Cardiology', t: 'AVNRT' },
-  { c: '5. Cardiology', t: 'WPW' },
-  { c: '5. Cardiology', t: 'Antiarrhythmic Drugs' },
-  { c: '5. Cardiology', t: 'Heart Murmurs' },
-  { c: '5. Cardiology', t: 'Heart Sounds' },
-  { c: '5. Cardiology', t: 'Heart Failure Basics' },
-  { c: '5. Cardiology', t: 'Systolic and Diastolic Heart Failure' },
-  { c: '5. Cardiology', t: 'Restrictive Cardiomyopathy' },
-  { c: '5. Cardiology', t: 'Acute Heart Failure' },
-  { c: '5. Cardiology', t: 'Chronic Heart Failure' },
-  { c: '5. Cardiology', t: 'Cardiac Embryology' },
-  { c: '5. Cardiology', t: 'Shunts' },
-  { c: '5. Cardiology', t: 'Cyanotic Congenital Heart Disease' },
-  { c: '5. Cardiology', t: 'Coarctation of the Aorta' },
-  { c: '5. Cardiology', t: 'Hypertension' },
-  { c: '5. Cardiology', t: 'Secondary Hypertension' },
-  { c: '5. Cardiology', t: 'Hypertension drugs' },
-  { c: '5. Cardiology', t: 'Valve Disease' },
-  { c: '5. Cardiology', t: 'Shock' },
-  { c: '5. Cardiology', t: 'Pericardial Disease' },
-  { c: '5. Cardiology', t: 'Aortic Dissection' },
-  { c: '5. Cardiology', t: 'Cardiac Tumors' },
-  { c: '5. Cardiology', t: 'Hypertrophic Cardiomyopathy' },
-  { c: '5. Cardiology', t: 'Endocarditis' },
-
-  // 6. Cell Biology
-  { c: '6. Cell Biology', t: 'DNA Replication' },
-  { c: '6. Cell Biology', t: 'DNA Mutations' },
-  { c: '6. Cell Biology', t: 'DNA Repair' },
-  { c: '6. Cell Biology', t: 'Transcription' },
-  { c: '6. Cell Biology', t: 'Translation' },
-  { c: '6. Cell Biology', t: 'PCR' },
-  { c: '6. Cell Biology', t: 'Blotting' },
-  { c: '6. Cell Biology', t: 'Flow Cytometry' },
-  { c: '6. Cell Biology', t: 'ELISA' },
-  { c: '6. Cell Biology', t: 'Microarrays and FISH' },
-  { c: '6. Cell Biology', t: 'Cell Cycle' },
-  { c: '6. Cell Biology', t: 'Cell Structure' },
-  { c: '6. Cell Biology', t: 'Cytoskeleton' },
-  { c: '6. Cell Biology', t: 'Connective Tissue' },
-
-  // 7. Dermatology
-  { c: '7. Dermatology', t: 'Skin' },
-  { c: '7. Dermatology', t: 'Epithelial Cells' },
-  { c: '7. Dermatology', t: 'Skin Disorders I' },
-  { c: '7. Dermatology', t: 'Skin Disorders II' },
-  { c: '7. Dermatology', t: 'Pigment Disorders' },
-  { c: '7. Dermatology', t: 'Vascular Lesions' },
-  { c: '7. Dermatology', t: 'Skin Infections' },
-  { c: '7. Dermatology', t: 'Blistering Disorders' },
-  { c: '7. Dermatology', t: 'Hypersensitivity Disorders' },
-  { c: '7. Dermatology', t: 'Skin Cancer' },
-  { c: '7. Dermatology', t: 'Neurocutaneous Disorders' },
-
-  // 8. Endocrinology
-  { c: '8. Endocrinology', t: 'Thyroid Gland' },
-  { c: '8. Endocrinology', t: 'Thyroid Disorders' },
-  { c: '8. Endocrinology', t: 'Thyroid Cancer' },
-  { c: '8. Endocrinology', t: 'Adrenal Glands' },
-  { c: '8. Endocrinology', t: 'Congenital Adrenal Hyperplasia' },
-  { c: '8. Endocrinology', t: 'Adrenal Disorders' },
-  { c: '8. Endocrinology', t: 'Endocrine Pancreas' },
-  { c: '8. Endocrinology', t: 'Diabetes' },
-  { c: '8. Endocrinology', t: 'Insulin' },
-  { c: '8. Endocrinology', t: 'Treatment of Diabetes' },
-  { c: '8. Endocrinology', t: 'Reproductive Hormones' },
-  { c: '8. Endocrinology', t: 'Male Reproductive Hormones' },
-  { c: '8. Endocrinology', t: 'Female Reproductive Hormones' },
-  { c: '8. Endocrinology', t: 'Menstrual Cycle' },
-  { c: '8. Endocrinology', t: 'Pituitary Gland' },
-  { c: '8. Endocrinology', t: 'Parathyroid Glands' },
-  { c: '8. Endocrinology', t: 'MEN Syndromes' },
-  { c: '8. Endocrinology', t: 'Signaling Pathways' },
-
-  // 9. Gastroenterology
-  { c: '9. Gastroenterology', t: 'Gastrointestinal Embryology' },
-  { c: '9. Gastroenterology', t: 'Gastrointestinal Anatomy' },
-  { c: '9. Gastroenterology', t: 'Gastrointestinal Blood Supply' },
-  { c: '9. Gastroenterology', t: 'Gastrointestinal Tract' },
-  { c: '9. Gastroenterology', t: 'Liver, Gallbladder, and Pancreas' },
-  { c: '9. Gastroenterology', t: 'Salivary Glands' },
-  { c: '9. Gastroenterology', t: 'Hernias' },
-  { c: '9. Gastroenterology', t: 'Bile' },
-  { c: '9. Gastroenterology', t: 'Bilirubin' },
-  { c: '9. Gastroenterology', t: 'Gastrointestinal Secretions' },
-  { c: '9. Gastroenterology', t: 'Gastrointestinal Hormones' },
-  { c: '9. Gastroenterology', t: 'Exocrine Pancreas' },
-  { c: '9. Gastroenterology', t: 'Esophageal Disorders' },
-  { c: '9. Gastroenterology', t: 'Liver Disease' },
-  { c: '9. Gastroenterology', t: 'Cirrhosis' },
-  { c: '9. Gastroenterology', t: 'Liver Tumors' },
-  { c: '9. Gastroenterology', t: 'Wilson’s Disease and Hemochromatosis' },
-  { c: '9. Gastroenterology', t: 'Gallstones' },
-  { c: '9. Gastroenterology', t: 'Biliary Disorders' },
-  { c: '9. Gastroenterology', t: 'Gastric Disorders' },
-  { c: '9. Gastroenterology', t: 'Malabsorption' },
-  { c: '9. Gastroenterology', t: 'Acute Pancreatitis' },
-  { c: '9. Gastroenterology', t: 'Chronic Pancreatitis & Pancreatic Cancer' },
-  { c: '9. Gastroenterology', t: 'Intestinal Disorders' },
-  { c: '9. Gastroenterology', t: 'Inflammatory Bowel Disease' },
-  { c: '9. Gastroenterology', t: 'Colon Cancer' },
-  { c: '9. Gastroenterology', t: 'Carcinoid Tumors' },
-  { c: '9. Gastroenterology', t: 'Gastrointestinal Pharmacology' },
-
-  // 10. Genetics
-  { c: '10. Genetics', t: 'Genetic Principles' },
-  { c: '10. Genetics', t: 'Gene Mapping' },
-  { c: '10. Genetics', t: 'Meiosis' },
-  { c: '10. Genetics', t: 'Hardy-Weinberg Law' },
-  { c: '10. Genetics', t: 'Pedigrees' },
-  { c: '10. Genetics', t: 'Imprinting' },
-  { c: '10. Genetics', t: 'Down Syndrome' },
-  { c: '10. Genetics', t: 'Trisomies' },
-  { c: '10. Genetics', t: 'Muscular Dystrophy' },
-  { c: '10. Genetics', t: 'Trinucleotide Repeat Disorders' },
-  { c: '10. Genetics', t: 'Deletion Syndromes' },
-  { c: '10. Genetics', t: 'Turner and Klinefelter Syndromes' },
-
-  // 11. Hematology
-  { c: '11. Hematology', t: 'Coagulation' },
-  { c: '11. Hematology', t: 'Platelet Activation' },
-  { c: '11. Hematology', t: 'Hypercoagulable States' },
-  { c: '11. Hematology', t: 'Coagulopathies' },
-  { c: '11. Hematology', t: 'Platelet Disorders' },
-  { c: '11. Hematology', t: 'Antiplatelet Drugs' },
-  { c: '11. Hematology', t: 'Anticoagulants' },
-  { c: '11. Hematology', t: 'Hemolysis Basics' },
-  { c: '11. Hematology', t: 'Extrinsic Hemolysis' },
-  { c: '11. Hematology', t: 'Intrinsic Hemolysis' },
-  { c: '11. Hematology', t: 'Microcytic Anemias' },
-  { c: '11. Hematology', t: 'Thalassemias' },
-  { c: '11. Hematology', t: 'Sickle Cell Anemia' },
-  { c: '11. Hematology', t: 'Other Anemias' },
-  { c: '11. Hematology', t: 'Blood Groups' },
-  { c: '11. Hematology', t: 'Acute Leukemia' },
-  { c: '11. Hematology', t: 'Chronic Leukemia' },
-  { c: '11. Hematology', t: 'Hodgkin Lymphoma' },
-  { c: '11. Hematology', t: 'Non-Hodgkin Lymphoma' },
-  { c: '11. Hematology', t: 'Plasma Cell Disorders' },
-  { c: '11. Hematology', t: 'Amyloidosis' },
-  { c: '11. Hematology', t: 'Myeloproliferative Disorders' },
-  { c: '11. Hematology', t: 'Antimetabolites' },
-  { c: '11. Hematology', t: 'Alkylating Agents' },
-  { c: '11. Hematology', t: 'Antitumor Antibiotics' },
-  { c: '11. Hematology', t: 'Microtubule Inhibitors' },
-  { c: '11. Hematology', t: 'DNA Drugs' },
-  { c: '11. Hematology', t: 'Other Cancer Drugs' },
-  { c: '11. Hematology', t: 'Porphyrias' },
-
-  // 12. Immunology
-  { c: '12. Immunology', t: 'Innate Immunity' },
-  { c: '12. Immunology', t: 'T-cells' },
-  { c: '12. Immunology', t: 'B-cells' },
-  { c: '12. Immunology', t: 'The Complement System' },
-  { c: '12. Immunology', t: 'Lymph Nodes and Spleen' },
-  { c: '12. Immunology', t: 'Hypersensitivity' },
-  { c: '12. Immunology', t: 'Transplants' },
-  { c: '12. Immunology', t: 'Immune Deficiency Syndromes' },
-  { c: '12. Immunology', t: 'Glucocorticoids and NSAIDs' },
-  { c: '12. Immunology', t: 'Immunosuppressive Drugs' },
-  { c: '12. Immunology', t: 'Systemic Lupus Erythematosus' },
-  { c: '12. Immunology', t: 'Rheumatoid Arthritis' },
-  { c: '12. Immunology', t: 'Scleroderma' },
-  { c: '12. Immunology', t: 'Sjogren’s Syndrome' },
-  { c: '12. Immunology', t: 'Vasculitis' },
-
-  // 13. Infectious Disease
-  { c: '13. Infectious Disease', t: 'Bacteria' },
-  { c: '13. Infectious Disease', t: 'Shapes and Stains' },
-  { c: '13. Infectious Disease', t: 'Bacterial Culture' },
-  { c: '13. Infectious Disease', t: 'Special Growth Requirements' },
-  { c: '13. Infectious Disease', t: 'Virulence' },
-  { c: '13. Infectious Disease', t: 'Growth and Genetics' },
-  { c: '13. Infectious Disease', t: 'Bacterial Identification' },
-  { c: '13. Infectious Disease', t: 'Staphylococci' },
-  { c: '13. Infectious Disease', t: 'Streptococci' },
-  { c: '13. Infectious Disease', t: 'Other Gram Positives' },
-  { c: '13. Infectious Disease', t: 'Gram Negative Rods' },
-  { c: '13. Infectious Disease', t: 'Other Gram Negatives' },
-  { c: '13. Infectious Disease', t: 'Spirochetes' },
-  { c: '13. Infectious Disease', t: 'Zoonotic Infections' },
-  { c: '13. Infectious Disease', t: 'Mycobacteria' },
-  { c: '13. Infectious Disease', t: 'Penicillins' },
-  { c: '13. Infectious Disease', t: 'Beta Lactams' },
-  { c: '13. Infectious Disease', t: 'Sulfonamides' },
-  { c: '13. Infectious Disease', t: 'Protein Synthesis Inhibitors' },
-  { c: '13. Infectious Disease', t: 'Other Antibiotics' },
-  { c: '13. Infectious Disease', t: 'Fungal Pneumonias' },
-  { c: '13. Infectious Disease', t: 'Fungal Skin Infections' },
-  { c: '13. Infectious Disease', t: 'Opportunistic Fungal Infections' },
-  { c: '13. Infectious Disease', t: 'Antifungal Drugs' },
-  { c: '13. Infectious Disease', t: 'Malaria' },
-  { c: '13. Infectious Disease', t: 'Protozoa' },
-  { c: '13. Infectious Disease', t: 'Helminths' },
-  { c: '13. Infectious Disease', t: 'Virus Structures' },
-  { c: '13. Infectious Disease', t: 'DNA Viruses' },
-  { c: '13. Infectious Disease', t: 'Herpes Viruses' },
-  { c: '13. Infectious Disease', t: 'RNA Viruses' },
-  { c: '13. Infectious Disease', t: 'Viral Hepatitis' },
-  { c: '13. Infectious Disease', t: 'HIV' },
-  { c: '13. Infectious Disease', t: 'HIV Drugs' },
-  { c: '13. Infectious Disease', t: 'Antiviral Drugs' },
-
-  // 14. Musculoskeletal
-  { c: '14. Musculoskeletal', t: 'Knee' },
-  { c: '14. Musculoskeletal', t: 'Shoulder and Elbow' },
-  { c: '14. Musculoskeletal', t: 'Brachial Plexus' },
-  { c: '14. Musculoskeletal', t: 'Wrist' },
-  { c: '14. Musculoskeletal', t: 'Hand' },
-  { c: '14. Musculoskeletal', t: 'Lumbosacral Plexus' },
-  { c: '14. Musculoskeletal', t: 'Lumbar Radiculopathy' },
-  { c: '14. Musculoskeletal', t: 'Hip' },
-  { c: '14. Musculoskeletal', t: 'Skeletal Muscle' },
-  { c: '14. Musculoskeletal', t: 'Cardiac Muscle' },
-  { c: '14. Musculoskeletal', t: 'Smooth Muscle' },
-  { c: '14. Musculoskeletal', t: 'Bone' },
-  { c: '14. Musculoskeletal', t: 'Bone Disorders' },
-  { c: '14. Musculoskeletal', t: 'Osteoporosis' },
-  { c: '14. Musculoskeletal', t: 'Osteoporosis Drugs' },
-  { c: '14. Musculoskeletal', t: 'Bone Tumors' },
-  { c: '14. Musculoskeletal', t: 'Osteoarthritis' },
-  { c: '14. Musculoskeletal', t: 'Gout' },
-  { c: '14. Musculoskeletal', t: 'Gout Drugs' },
-  { c: '14. Musculoskeletal', t: 'CPPD' },
-  { c: '14. Musculoskeletal', t: 'Seronegative Spondyloarthritis' },
-  { c: '14. Musculoskeletal', t: 'Muscle Disorders' },
-  { c: '14. Musculoskeletal', t: 'Neuromuscular Disorders' },
-
-  // 15. Neurology
-  { c: '15. Neurology', t: 'Cells of the Nervous System' },
-  { c: '15. Neurology', t: 'Nerve Damage' },
-  { c: '15. Neurology', t: 'Blood Brain Barrier' },
-  { c: '15. Neurology', t: 'Neurotransmitters' },
-  { c: '15. Neurology', t: 'Dermatomes and Reflexes' },
-  { c: '15. Neurology', t: 'Cerebral Cortex' },
-  { c: '15. Neurology', t: 'Spinal Cord' },
-  { c: '15. Neurology', t: 'Spinal Cord Syndromes' },
-  { c: '15. Neurology', t: 'Brainstem' },
-  { c: '15. Neurology', t: 'Cranial Nerves' },
-  { c: '15. Neurology', t: 'Auditory System' },
-  { c: '15. Neurology', t: 'Vestibular System' },
-  { c: '15. Neurology', t: 'Thalamus, Hypothalamus, Limbic System' },
-  { c: '15. Neurology', t: 'Cerebellum' },
-  { c: '15. Neurology', t: 'Basal Ganglia' },
-  { c: '15. Neurology', t: 'Ventricles and Sinuses' },
-  { c: '15. Neurology', t: 'Cerebral and Lacunar Strokes' },
-  { c: '15. Neurology', t: 'Vertebrobasilar Stroke Syndromes' },
-  { c: '15. Neurology', t: 'CNS Aneurysms' },
-  { c: '15. Neurology', t: 'Intracranial Bleeding' },
-  { c: '15. Neurology', t: 'Management of TIA/Stroke' },
-  { c: '15. Neurology', t: 'Autonomic Nervous System' },
-  { c: '15. Neurology', t: 'ANS Drugs: Norepinephrine' },
-  { c: '15. Neurology', t: 'ANS Drugs: Acetylcholine' },
-  { c: '15. Neurology', t: 'Autonomic Receptors' },
-  { c: '15. Neurology', t: 'The Pupil' },
-  { c: '15. Neurology', t: 'The Lens' },
-  { c: '15. Neurology', t: 'The Retina' },
-  { c: '15. Neurology', t: 'Eye Movements' },
-  { c: '15. Neurology', t: 'Visual Fields' },
-  { c: '15. Neurology', t: 'Gaze Palsies' },
-  { c: '15. Neurology', t: 'Structural Eye Disorders' },
-  { c: '15. Neurology', t: 'Glaucoma' },
-  { c: '15. Neurology', t: 'General Anesthesia' },
-  { c: '15. Neurology', t: 'Local Anesthesia' },
-  { c: '15. Neurology', t: 'Neuromuscular Blockers' },
-  { c: '15. Neurology', t: 'Meningitis' },
-  { c: '15. Neurology', t: 'Seizures' },
-  { c: '15. Neurology', t: 'Neuroembryology' },
-  { c: '15. Neurology', t: 'Delirium and Dementia' },
-  { c: '15. Neurology', t: 'Demyelinating Disease' },
-  { c: '15. Neurology', t: 'Headaches' },
-  { c: '15. Neurology', t: 'Brain Tumors' },
-  { c: '15. Neurology', t: 'Parkinson’s, Huntington’s, and Movement Disorders' },
-  { c: '15. Neurology', t: 'HIV CNS Infections' },
-
-  // 16. Pathology
-  { c: '16. Pathology', t: 'Cellular Adaptations' },
-  { c: '16. Pathology', t: 'Cell Injury' },
-  { c: '16. Pathology', t: 'Free Radicals' },
-  { c: '16. Pathology', t: 'Apoptosis' },
-  { c: '16. Pathology', t: 'Necrosis' },
-  { c: '16. Pathology', t: 'Inflammation Principles' },
-  { c: '16. Pathology', t: 'Acute and Chronic Inflammation' },
-  { c: '16. Pathology', t: 'Granulomatous Inflammation' },
-  { c: '16. Pathology', t: 'Wound Healing and Scar' },
-  { c: '16. Pathology', t: 'Pathologic Calcification' },
-  { c: '16. Pathology', t: 'Neoplasia' },
-
-  // 17. Psychiatry
-  { c: '17. Psychiatry', t: 'Conditioning and Transference' },
-  { c: '17. Psychiatry', t: 'Ego Defenses' },
-  { c: '17. Psychiatry', t: 'Child Abuse and Neglect' },
-  { c: '17. Psychiatry', t: 'Childhood Disorders' },
-  { c: '17. Psychiatry', t: 'ADHD Autism' },
-  { c: '17. Psychiatry', t: 'Cognitive Disorders' },
-  { c: '17. Psychiatry', t: 'Psychosis' },
-  { c: '17. Psychiatry', t: 'Psychotic Disorders' },
-  { c: '17. Psychiatry', t: 'Dissociative Disorders' },
-  { c: '17. Psychiatry', t: 'Somatic and Factitious Disorders' },
-  { c: '17. Psychiatry', t: 'Personality Disorders' },
-  { c: '17. Psychiatry', t: 'Mood Disorders' },
-  { c: '17. Psychiatry', t: 'Anxiety Disorders' },
-  { c: '17. Psychiatry', t: 'Eating Disorders' },
-  { c: '17. Psychiatry', t: 'Sleep Disorders' },
-  { c: '17. Psychiatry', t: 'Alcohol and CNS Depressants' },
-  { c: '17. Psychiatry', t: 'Opioids' },
-  { c: '17. Psychiatry', t: 'Stimulants' },
-  { c: '17. Psychiatry', t: 'Other Drugs' },
-  { c: '17. Psychiatry', t: 'Antidepressants' },
-  { c: '17. Psychiatry', t: 'Lithium' },
-  { c: '17. Psychiatry', t: 'Antipsychotics' },
-
-  // 18. Pulmonary
-  { c: '18. Pulmonary', t: 'Pulmonary Embryology' },
-  { c: '18. Pulmonary', t: 'Pulmonary Anatomy' },
-  { c: '18. Pulmonary', t: 'Pulmonary Physiology' },
-  { c: '18. Pulmonary', t: 'Hemoglobin' },
-  { c: '18. Pulmonary', t: 'Pulmonary Circulation' },
-  { c: '18. Pulmonary', t: 'Hypoxia' },
-  { c: '18. Pulmonary', t: 'Ventilation and Perfusion' },
-  { c: '18. Pulmonary', t: 'Carbon Dioxide' },
-  { c: '18. Pulmonary', t: 'Pulmonary Physical Exam' },
-  { c: '18. Pulmonary', t: 'Pulmonary Function Tests' },
-  { c: '18. Pulmonary', t: 'Obstructive Lung Disease' },
-  { c: '18. Pulmonary', t: 'Restrictive Lung Disease' },
-  { c: '18. Pulmonary', t: 'Treatment of COPD and Asthma' },
-  { c: '18. Pulmonary', t: 'Pneumonia' },
-  { c: '18. Pulmonary', t: 'Pleural Disease' },
-  { c: '18. Pulmonary', t: 'Lung Cancer' },
-  { c: '18. Pulmonary', t: 'Sleep Apnea' },
-  { c: '18. Pulmonary', t: 'Cystic Fibrosis' },
-  { c: '18. Pulmonary', t: 'Tuberculosis' },
-  { c: '18. Pulmonary', t: 'Sarcoidosis' },
-  { c: '18. Pulmonary', t: 'Pulmonary Embolism' },
-  { c: '18. Pulmonary', t: 'Chest X-rays' },
-
-  // 19. Renal
-  { c: '19. Renal', t: 'Renal Embryology' },
-  { c: '19. Renal', t: 'Renal Anatomy' },
-  { c: '19. Renal', t: 'Renal Physiology I' },
-  { c: '19. Renal', t: 'Renal Physiology II' },
-  { c: '19. Renal', t: 'Nephron Physiology' },
-  { c: '19. Renal', t: 'Renal Endocrine Function' },
-  { c: '19. Renal', t: 'Acid Excretion' },
-  { c: '19. Renal', t: 'Acid-Base Principles' },
-  { c: '19. Renal', t: 'Respiratory Disorders' },
-  { c: '19. Renal', t: 'Metabolic Alkalosis' },
-  { c: '19. Renal', t: 'Renal Tubular Acidosis' },
-  { c: '19. Renal', t: 'Metabolic Acidosis' },
-  { c: '19. Renal', t: 'Acid Base Problems' },
-  { c: '19. Renal', t: 'Electrolyte Disorders' },
-  { c: '19. Renal', t: 'Sodium and Water Balance' },
-  { c: '19. Renal', t: 'Sodium Disorders' },
-  { c: '19. Renal', t: 'Glomerulonephritis Principles' },
-  { c: '19. Renal', t: 'Nephritic Syndrome' },
-  { c: '19. Renal', t: 'Nephrotic Syndrome' },
-  { c: '19. Renal', t: 'MPGN' },
-  { c: '19. Renal', t: 'Tubulointerstitial Disease' },
-  { c: '19. Renal', t: 'Renal Failure' },
-  { c: '19. Renal', t: 'Urinary Tract Infections' },
-  { c: '19. Renal', t: 'Cystic Kidney Disease' },
-  { c: '19. Renal', t: 'Diuretics' },
-  { c: '19. Renal', t: 'Kidney Stones' },
-  { c: '19. Renal', t: 'Renal and Bladder Tumors' },
-  { c: '19. Renal', t: 'Rhabdomyolysis' },
-
-  // 20. Reproductive
-  { c: '20. Reproductive', t: 'Embryonic Genes' },
-  { c: '20. Reproductive', t: 'Embryogenesis' },
-  { c: '20. Reproductive', t: 'Germ Layers' },
-  { c: '20. Reproductive', t: 'Errors in Morphogenesis' },
-  { c: '20. Reproductive', t: 'Teratogens I' },
-  { c: '20. Reproductive', t: 'Teratogens II' },
-  { c: '20. Reproductive', t: 'Pharyngeal Arches' },
-  { c: '20. Reproductive', t: 'Cleft Lip and Palate' },
-  { c: '20. Reproductive', t: 'Pharyngeal Pouches and Clefts' },
-  { c: '20. Reproductive', t: 'Genital Embryology' },
-  { c: '20. Reproductive', t: 'Spermatogenesis and Oogenesis' },
-  { c: '20. Reproductive', t: 'Placenta' },
-  { c: '20. Reproductive', t: 'Twins' },
-  { c: '20. Reproductive', t: 'Pregnancy' },
-  { c: '20. Reproductive', t: 'Maternal-Fetal Disorders' },
-  { c: '20. Reproductive', t: 'Hypertension in Pregnancy' },
-  { c: '20. Reproductive', t: 'Placental Complications' },
-  { c: '20. Reproductive', t: 'Gestational Tumors' },
-  { c: '20. Reproductive', t: 'TORCH Infections' },
-  { c: '20. Reproductive', t: 'Vaginal Cancer' },
-  { c: '20. Reproductive', t: 'Cervical Cancer' },
-  { c: '20. Reproductive', t: 'Endometrial Disorders' },
-  { c: '20. Reproductive', t: 'Endometriosis' },
-  { c: '20. Reproductive', t: 'Endometrial Cancer' },
-  { c: '20. Reproductive', t: 'Ovarian Cysts' },
-  { c: '20. Reproductive', t: 'Ovarian Epithelial Tumors' },
-  { c: '20. Reproductive', t: 'Ovarian Stromal Tumors' },
-  { c: '20. Reproductive', t: 'Ovarian Germ Cell Tumors' },
-  { c: '20. Reproductive', t: 'Breast Tissue' },
-  { c: '20. Reproductive', t: 'Breast Disorders' },
-  { c: '20. Reproductive', t: 'Breast Carcinoma' },
-  { c: '20. Reproductive', t: 'Penile Disorders' },
-  { c: '20. Reproductive', t: 'Scrotal Disorders' },
-  { c: '20. Reproductive', t: 'Testicular Cancer' },
-  { c: '20. Reproductive', t: 'Prostate' },
-  { c: '20. Reproductive', t: 'Disorders of Sexual Development' },
-  { c: '20. Reproductive', t: 'Hypogonadism' }
-];
+                { c: '1. Basic Pharmacology', t: 'Enzymes' }, { c: '1. Basic Pharmacology', t: 'Enzyme Inhibitors' }, { c: '1. Basic Pharmacology', t: 'Dose-Response' }, { c: '1. Basic Pharmacology', t: 'Drug Elimination' }, { c: '1. Basic Pharmacology', t: 'Pharmacokinetics' },
+                { c: '2. Behavioral Science', t: 'Ethics Principles' }, { c: '2. Behavioral Science', t: 'Informed Consent' }, { c: '2. Behavioral Science', t: 'Confidentiality' }, { c: '2. Behavioral Science', t: 'Decision-Making Capacity' }, { c: '2. Behavioral Science', t: 'Public Health' }, { c: '2. Behavioral Science', t: 'Quality and Safety' }, { c: '2. Behavioral Science', t: 'The Healthy Patient' }, { c: '2. Behavioral Science', t: 'Geriatrics' }, { c: '2. Behavioral Science', t: 'Pediatrics' },
+                { c: '3. Biochemistry', t: 'DNA Structure' }, { c: '3. Biochemistry', t: 'Purine Metabolism' }, { c: '3. Biochemistry', t: 'Pyrimidine Metabolism' }, { c: '3. Biochemistry', t: 'Glucose' }, { c: '3. Biochemistry', t: 'Glycolysis' }, { c: '3. Biochemistry', t: 'Gluconeogenesis' }, { c: '3. Biochemistry', t: 'Glycogen' }, { c: '3. Biochemistry', t: 'HMP Shunt' }, { c: '3. Biochemistry', t: 'Fructose and Galactose' }, { c: '3. Biochemistry', t: 'Pyruvate Dehydrogenase' }, { c: '3. Biochemistry', t: 'TCA Cycle' }, { c: '3. Biochemistry', t: 'Electron Transport Chain' }, { c: '3. Biochemistry', t: 'Fatty Acids' }, { c: '3. Biochemistry', t: 'Ketone Bodies' }, { c: '3. Biochemistry', t: 'Ethanol Metabolism' }, { c: '3. Biochemistry', t: 'Exercise and Starvation' }, { c: '3. Biochemistry', t: 'Inborn Errors of Metabolism' }, { c: '3. Biochemistry', t: 'Amino Acids' }, { c: '3. Biochemistry', t: 'Phenylalanine and Tyrosine' }, { c: '3. Biochemistry', t: 'Other Amino Acids' }, { c: '3. Biochemistry', t: 'Ammonia' }, { c: '3. Biochemistry', t: 'B Vitamins' }, { c: '3. Biochemistry', t: 'B12 and Folate' }, { c: '3. Biochemistry', t: 'Other Vitamins' }, { c: '3. Biochemistry', t: 'Lipid Metabolism' }, { c: '3. Biochemistry', t: 'Hyperlipidemia' }, { c: '3. Biochemistry', t: 'Lipid Drugs' }, { c: '3. Biochemistry', t: 'Lysosomal Storage Diseases' },
+                { c: '4. Biostats/Epi', t: 'Basic Statistics' }, { c: '4. Biostats/Epi', t: 'Hypothesis Testing' }, { c: '4. Biostats/Epi', t: 'Tests of Significance' }, { c: '4. Biostats/Epi', t: 'Correlations' }, { c: '4. Biostats/Epi', t: 'Study Designs' }, { c: '4. Biostats/Epi', t: 'Risk Quantification' }, { c: '4. Biostats/Epi', t: 'Sensitivity and Specificity' }, { c: '4. Biostats/Epi', t: 'Positive and Negative Predictive Value' }, { c: '4. Biostats/Epi', t: 'Diagnostic Tests' }, { c: '4. Biostats/Epi', t: 'Bias' }, { c: '4. Biostats/Epi', t: 'Clinical Trials' }, { c: '4. Biostats/Epi', t: 'Evidence-based Medicine' },
+                { c: '5. Cardiology', t: 'Cardiac Anatomy' }, { c: '5. Cardiology', t: 'Cardiac Physiology' }, { c: '5. Cardiology', t: 'CV Response to Exercise' }, { c: '5. Cardiology', t: 'Blood Flow Mechanics' }, { c: '5. Cardiology', t: 'Regulation of Blood Pressure' }, { c: '5. Cardiology', t: 'PV Loops' }, { c: '5. Cardiology', t: 'Wiggers’ Diagram' }, { c: '5. Cardiology', t: 'Venous Pressure Tracings' }, { c: '5. Cardiology', t: 'Starling Curve' }, { c: '5. Cardiology', t: 'Atherosclerosis' }, { c: '5. Cardiology', t: 'Cardiac Ischemia' }, { c: '5. Cardiology', t: 'STEMI' }, { c: '5. Cardiology', t: 'Unstable Angina/NSTEMI' }, { c: '5. Cardiology', t: 'Stable Angina' }, { c: '5. Cardiology', t: 'EKG Basics' }, { c: '5. Cardiology', t: 'High Yield EKGs' }, { c: '5. Cardiology', t: 'Cardiac Action Potentials' }, { c: '5. Cardiology', t: 'AV and Bundle Branch Blocks' }, { c: '5. Cardiology', t: 'Atrial Fibrillation and Flutter' }, { c: '5. Cardiology', t: 'AVNRT' }, { c: '5. Cardiology', t: 'WPW' }, { c: '5. Cardiology', t: 'Antiarrhythmic Drugs' }, { c: '5. Cardiology', t: 'Heart Murmurs' }, { c: '5. Cardiology', t: 'Heart Sounds' }, { c: '5. Cardiology', t: 'Heart Failure Basics' }, { c: '5. Cardiology', t: 'Systolic and Diastolic Heart Failure' }, { c: '5. Cardiology', t: 'Restrictive Cardiomyopathy' }, { c: '5. Cardiology', t: 'Acute Heart Failure' }, { c: '5. Cardiology', t: 'Chronic Heart Failure' }, { c: '5. Cardiology', t: 'Cardiac Embryology' }, { c: '5. Cardiology', t: 'Shunts' }, { c: '5. Cardiology', t: 'Cyanotic Congenital Heart Disease' }, { c: '5. Cardiology', t: 'Coarctation of the Aorta' }, { c: '5. Cardiology', t: 'Hypertension' }, { c: '5. Cardiology', t: 'Secondary Hypertension' }, { c: '5. Cardiology', t: 'Hypertension drugs' }, { c: '5. Cardiology', t: 'Valve Disease' }, { c: '5. Cardiology', t: 'Shock' }, { c: '5. Cardiology', t: 'Pericardial Disease' }, { c: '5. Cardiology', t: 'Aortic Dissection' }, { c: '5. Cardiology', t: 'Cardiac Tumors' }, { c: '5. Cardiology', t: 'Hypertrophic Cardiomyopathy' }, { c: '5. Cardiology', t: 'Endocarditis' },
+                { c: '6. Cell Biology', t: 'DNA Replication' }, { c: '6. Cell Biology', t: 'DNA Mutations' }, { c: '6. Cell Biology', t: 'DNA Repair' }, { c: '6. Cell Biology', t: 'Transcription' }, { c: '6. Cell Biology', t: 'Translation' }, { c: '6. Cell Biology', t: 'PCR' }, { c: '6. Cell Biology', t: 'Blotting' }, { c: '6. Cell Biology', t: 'Flow Cytometry' }, { c: '6. Cell Biology', t: 'ELISA' }, { c: '6. Cell Biology', t: 'Microarrays and FISH' }, { c: '6. Cell Biology', t: 'Cell Cycle' }, { c: '6. Cell Biology', t: 'Cell Structure' }, { c: '6. Cell Biology', t: 'Cytoskeleton' }, { c: '6. Cell Biology', t: 'Connective Tissue' },
+                { c: '7. Dermatology', t: 'Skin' }, { c: '7. Dermatology', t: 'Epithelial Cells' }, { c: '7. Dermatology', t: 'Skin Disorders I' }, { c: '7. Dermatology', t: 'Skin Disorders II' }, { c: '7. Dermatology', t: 'Pigment Disorders' }, { c: '7. Dermatology', t: 'Vascular Lesions' }, { c: '7. Dermatology', t: 'Skin Infections' }, { c: '7. Dermatology', t: 'Blistering Disorders' }, { c: '7. Dermatology', t: 'Hypersensitivity Disorders' }, { c: '7. Dermatology', t: 'Skin Cancer' }, { c: '7. Dermatology', t: 'Neurocutaneous Disorders' },
+                { c: '8. Endocrinology', t: 'Thyroid Gland' }, { c: '8. Endocrinology', t: 'Thyroid Disorders' }, { c: '8. Endocrinology', t: 'Thyroid Cancer' }, { c: '8. Endocrinology', t: 'Adrenal Glands' }, { c: '8. Endocrinology', t: 'Congenital Adrenal Hyperplasia' }, { c: '8. Endocrinology', t: 'Adrenal Disorders' }, { c: '8. Endocrinology', t: 'Endocrine Pancreas' }, { c: '8. Endocrinology', t: 'Diabetes' }, { c: '8. Endocrinology', t: 'Insulin' }, { c: '8. Endocrinology', t: 'Treatment of Diabetes' }, { c: '8. Endocrinology', t: 'Reproductive Hormones' }, { c: '8. Endocrinology', t: 'Male Reproductive Hormones' }, { c: '8. Endocrinology', t: 'Female Reproductive Hormones' }, { c: '8. Endocrinology', t: 'Menstrual Cycle' }, { c: '8. Endocrinology', t: 'Pituitary Gland' }, { c: '8. Endocrinology', t: 'Parathyroid Glands' }, { c: '8. Endocrinology', t: 'MEN Syndromes' }, { c: '8. Endocrinology', t: 'Signaling Pathways' },
+                { c: '9. Gastroenterology', t: 'Gastrointestinal Embryology' }, { c: '9. Gastroenterology', t: 'Gastrointestinal Anatomy' }, { c: '9. Gastroenterology', t: 'Gastrointestinal Blood Supply' }, { c: '9. Gastroenterology', t: 'Gastrointestinal Tract' }, { c: '9. Gastroenterology', t: 'Liver, Gallbladder, and Pancreas' }, { c: '9. Gastroenterology', t: 'Salivary Glands' }, { c: '9. Gastroenterology', t: 'Hernias' }, { c: '9. Gastroenterology', t: 'Bile' }, { c: '9. Gastroenterology', t: 'Bilirubin' }, { c: '9. Gastroenterology', t: 'Gastrointestinal Secretions' }, { c: '9. Gastroenterology', t: 'Gastrointestinal Hormones' }, { c: '9. Gastroenterology', t: 'Exocrine Pancreas' }, { c: '9. Gastroenterology', t: 'Esophageal Disorders' }, { c: '9. Gastroenterology', t: 'Liver Disease' }, { c: '9. Gastroenterology', t: 'Cirrhosis' }, { c: '9. Gastroenterology', t: 'Liver Tumors' }, { c: '9. Gastroenterology', t: 'Wilson’s Disease and Hemochromatosis' }, { c: '9. Gastroenterology', t: 'Gallstones' }, { c: '9. Gastroenterology', t: 'Biliary Disorders' }, { c: '9. Gastroenterology', t: 'Gastric Disorders' }, { c: '9. Gastroenterology', t: 'Malabsorption' }, { c: '9. Gastroenterology', t: 'Acute Pancreatitis' }, { c: '9. Gastroenterology', t: 'Chronic Pancreatitis & Pancreatic Cancer' }, { c: '9. Gastroenterology', t: 'Intestinal Disorders' }, { c: '9. Gastroenterology', t: 'Inflammatory Bowel Disease' }, { c: '9. Gastroenterology', t: 'Colon Cancer' }, { c: '9. Gastroenterology', t: 'Carcinoid Tumors' }, { c: '9. Gastroenterology', t: 'Gastrointestinal Pharmacology' },
+                { c: '10. Genetics', t: 'Genetic Principles' }, { c: '10. Genetics', t: 'Gene Mapping' }, { c: '10. Genetics', t: 'Meiosis' }, { c: '10. Genetics', t: 'Hardy-Weinberg Law' }, { c: '10. Genetics', t: 'Pedigrees' }, { c: '10. Genetics', t: 'Imprinting' }, { c: '10. Genetics', t: 'Down Syndrome' }, { c: '10. Genetics', t: 'Trisomies' }, { c: '10. Genetics', t: 'Muscular Dystrophy' }, { c: '10. Genetics', t: 'Trinucleotide Repeat Disorders' }, { c: '10. Genetics', t: 'Deletion Syndromes' }, { c: '10. Genetics', t: 'Turner and Klinefelter Syndromes' },
+                { c: '11. Hematology', t: 'Coagulation' }, { c: '11. Hematology', t: 'Platelet Activation' }, { c: '11. Hematology', t: 'Hypercoagulable States' }, { c: '11. Hematology', t: 'Coagulopathies' }, { c: '11. Hematology', t: 'Platelet Disorders' }, { c: '11. Hematology', t: 'Antiplatelet Drugs' }, { c: '11. Hematology', t: 'Anticoagulants' }, { c: '11. Hematology', t: 'Hemolysis Basics' }, { c: '11. Hematology', t: 'Extrinsic Hemolysis' }, { c: '11. Hematology', t: 'Intrinsic Hemolysis' }, { c: '11. Hematology', t: 'Microcytic Anemias' }, { c: '11. Hematology', t: 'Thalassemias' }, { c: '11. Hematology', t: 'Sickle Cell Anemia' }, { c: '11. Hematology', t: 'Other Anemias' }, { c: '11. Hematology', t: 'Blood Groups' }, { c: '11. Hematology', t: 'Acute Leukemia' }, { c: '11. Hematology', t: 'Chronic Leukemia' }, { c: '11. Hematology', t: 'Hodgkin Lymphoma' }, { c: '11. Hematology', t: 'Non-Hodgkin Lymphoma' }, { c: '11. Hematology', t: 'Plasma Cell Disorders' }, { c: '11. Hematology', t: 'Amyloidosis' }, { c: '11. Hematology', t: 'Myeloproliferative Disorders' }, { c: '11. Hematology', t: 'Antimetabolites' }, { c: '11. Hematology', t: 'Alkylating Agents' }, { c: '11. Hematology', t: 'Antitumor Antibiotics' }, { c: '11. Hematology', t: 'Microtubule Inhibitors' }, { c: '11. Hematology', t: 'DNA Drugs' }, { c: '11. Hematology', t: 'Other Cancer Drugs' }, { c: '11. Hematology', t: 'Porphyrias' },
+                { c: '12. Immunology', t: 'Innate Immunity' }, { c: '12. Immunology', t: 'T-cells' }, { c: '12. Immunology', t: 'B-cells' }, { c: '12. Immunology', t: 'The Complement System' }, { c: '12. Immunology', t: 'Lymph Nodes and Spleen' }, { c: '12. Immunology', t: 'Hypersensitivity' }, { c: '12. Immunology', t: 'Transplants' }, { c: '12. Immunology', t: 'Immune Deficiency Syndromes' }, { c: '12. Immunology', t: 'Glucocorticoids and NSAIDs' }, { c: '12. Immunology', t: 'Immunosuppressive Drugs' }, { c: '12. Immunology', t: 'Systemic Lupus Erythematosus' }, { c: '12. Immunology', t: 'Rheumatoid Arthritis' }, { c: '12. Immunology', t: 'Scleroderma' }, { c: '12. Immunology', t: 'Sjogren’s Syndrome' }, { c: '12. Immunology', t: 'Vasculitis' },
+                { c: '13. Infectious Disease', t: 'Bacteria' }, { c: '13. Infectious Disease', t: 'Shapes and Stains' }, { c: '13. Infectious Disease', t: 'Bacterial Culture' }, { c: '13. Infectious Disease', t: 'Special Growth Requirements' }, { c: '13. Infectious Disease', t: 'Virulence' }, { c: '13. Infectious Disease', t: 'Growth and Genetics' }, { c: '13. Infectious Disease', t: 'Bacterial Identification' }, { c: '13. Infectious Disease', t: 'Staphylococci' }, { c: '13. Infectious Disease', t: 'Streptococci' }, { c: '13. Infectious Disease', t: 'Other Gram Positives' }, { c: '13. Infectious Disease', t: 'Gram Negative Rods' }, { c: '13. Infectious Disease', t: 'Other Gram Negatives' }, { c: '13. Infectious Disease', t: 'Spirochetes' }, { c: '13. Infectious Disease', t: 'Zoonotic Infections' }, { c: '13. Infectious Disease', t: 'Mycobacteria' }, { c: '13. Infectious Disease', t: 'Penicillins' }, { c: '13. Infectious Disease', t: 'Beta Lactams' }, { c: '13. Infectious Disease', t: 'Sulfonamides' }, { c: '13. Infectious Disease', t: 'Protein Synthesis Inhibitors' }, { c: '13. Infectious Disease', t: 'Other Antibiotics' }, { c: '13. Infectious Disease', t: 'Fungal Pneumonias' }, { c: '13. Infectious Disease', t: 'Fungal Skin Infections' }, { c: '13. Infectious Disease', t: 'Opportunistic Fungal Infections' }, { c: '13. Infectious Disease', t: 'Antifungal Drugs' }, { c: '13. Infectious Disease', t: 'Malaria' }, { c: '13. Infectious Disease', t: 'Protozoa' }, { c: '13. Infectious Disease', t: 'Helminths' }, { c: '13. Infectious Disease', t: 'Virus Structures' }, { c: '13. Infectious Disease', t: 'DNA Viruses' }, { c: '13. Infectious Disease', t: 'Herpes Viruses' }, { c: '13. Infectious Disease', t: 'RNA Viruses' }, { c: '13. Infectious Disease', t: 'Viral Hepatitis' }, { c: '13. Infectious Disease', t: 'HIV' }, { c: '13. Infectious Disease', t: 'HIV Drugs' }, { c: '13. Infectious Disease', t: 'Antiviral Drugs' },
+                { c: '14. Musculoskeletal', t: 'Knee' }, { c: '14. Musculoskeletal', t: 'Shoulder and Elbow' }, { c: '14. Musculoskeletal', t: 'Brachial Plexus' }, { c: '14. Musculoskeletal', t: 'Wrist' }, { c: '14. Musculoskeletal', t: 'Hand' }, { c: '14. Musculoskeletal', t: 'Lumbosacral Plexus' }, { c: '14. Musculoskeletal', t: 'Lumbar Radiculopathy' }, { c: '14. Musculoskeletal', t: 'Hip' }, { c: '14. Musculoskeletal', t: 'Skeletal Muscle' }, { c: '14. Musculoskeletal', t: 'Cardiac Muscle' }, { c: '14. Musculoskeletal', t: 'Smooth Muscle' }, { c: '14. Musculoskeletal', t: 'Bone' }, { c: '14. Musculoskeletal', t: 'Bone Disorders' }, { c: '14. Musculoskeletal', t: 'Osteoporosis' }, { c: '14. Musculoskeletal', t: 'Osteoporosis Drugs' }, { c: '14. Musculoskeletal', t: 'Bone Tumors' }, { c: '14. Musculoskeletal', t: 'Osteoarthritis' }, { c: '14. Musculoskeletal', t: 'Gout' }, { c: '14. Musculoskeletal', t: 'Gout Drugs' }, { c: '14. Musculoskeletal', t: 'CPPD' }, { c: '14. Musculoskeletal', t: 'Seronegative Spondyloarthritis' }, { c: '14. Musculoskeletal', t: 'Muscle Disorders' }, { c: '14. Musculoskeletal', t: 'Neuromuscular Disorders' },
+                { c: '15. Neurology', t: 'Cells of the Nervous System' }, { c: '15. Neurology', t: 'Nerve Damage' }, { c: '15. Neurology', t: 'Blood Brain Barrier' }, { c: '15. Neurology', t: 'Neurotransmitters' }, { c: '15. Neurology', t: 'Dermatomes and Reflexes' }, { c: '15. Neurology', t: 'Cerebral Cortex' }, { c: '15. Neurology', t: 'Spinal Cord' }, { c: '15. Neurology', t: 'Spinal Cord Syndromes' }, { c: '15. Neurology', t: 'Brainstem' }, { c: '15. Neurology', t: 'Cranial Nerves' }, { c: '15. Neurology', t: 'Auditory System' }, { c: '15. Neurology', t: 'Vestibular System' }, { c: '15. Neurology', t: 'Thalamus, Hypothalamus, Limbic System' }, { c: '15. Neurology', t: 'Cerebellum' }, { c: '15. Neurology', t: 'Basal Ganglia' }, { c: '15. Neurology', t: 'Ventricles and Sinuses' }, { c: '15. Neurology', t: 'Cerebral and Lacunar Strokes' }, { c: '15. Neurology', t: 'Vertebrobasilar Stroke Syndromes' }, { c: '15. Neurology', t: 'CNS Aneurysms' }, { c: '15. Neurology', t: 'Intracranial Bleeding' }, { c: '15. Neurology', t: 'Management of TIA/Stroke' }, { c: '15. Neurology', t: 'Autonomic Nervous System' }, { c: '15. Neurology', t: 'ANS Drugs: Norepinephrine' }, { c: '15. Neurology', t: 'ANS Drugs: Acetylcholine' }, { c: '15. Neurology', t: 'Autonomic Receptors' }, { c: '15. Neurology', t: 'The Pupil' }, { c: '15. Neurology', t: 'The Lens' }, { c: '15. Neurology', t: 'The Retina' }, { c: '15. Neurology', t: 'Eye Movements' }, { c: '15. Neurology', t: 'Visual Fields' }, { c: '15. Neurology', t: 'Gaze Palsies' }, { c: '15. Neurology', t: 'Structural Eye Disorders' }, { c: '15. Neurology', t: 'Glaucoma' }, { c: '15. Neurology', t: 'General Anesthesia' }, { c: '15. Neurology', t: 'Local Anesthesia' }, { c: '15. Neurology', t: 'Neuromuscular Blockers' }, { c: '15. Neurology', t: 'Meningitis' }, { c: '15. Neurology', t: 'Seizures' }, { c: '15. Neurology', t: 'Neuroembryology' }, { c: '15. Neurology', t: 'Delirium and Dementia' }, { c: '15. Neurology', t: 'Demyelinating Disease' }, { c: '15. Neurology', t: 'Headaches' }, { c: '15. Neurology', t: 'Brain Tumors' }, { c: '15. Neurology', t: 'Parkinson’s, Huntington’s, and Movement Disorders' }, { c: '15. Neurology', t: 'HIV CNS Infections' },
+                { c: '16. Pathology', t: 'Cellular Adaptations' }, { c: '16. Pathology', t: 'Cell Injury' }, { c: '16. Pathology', t: 'Free Radicals' }, { c: '16. Pathology', t: 'Apoptosis' }, { c: '16. Pathology', t: 'Necrosis' }, { c: '16. Pathology', t: 'Inflammation Principles' }, { c: '16. Pathology', t: 'Acute and Chronic Inflammation' }, { c: '16. Pathology', t: 'Granulomatous Inflammation' }, { c: '16. Pathology', t: 'Wound Healing and Scar' }, { c: '16. Pathology', t: 'Pathologic Calcification' }, { c: '16. Pathology', t: 'Neoplasia' },
+                { c: '17. Psychiatry', t: 'Conditioning and Transference' }, { c: '17. Psychiatry', t: 'Ego Defenses' }, { c: '17. Psychiatry', t: 'Child Abuse and Neglect' }, { c: '17. Psychiatry', t: 'Childhood Disorders' }, { c: '17. Psychiatry', t: 'ADHD Autism' }, { c: '17. Psychiatry', t: 'Cognitive Disorders' }, { c: '17. Psychiatry', t: 'Psychosis' }, { c: '17. Psychiatry', t: 'Psychotic Disorders' }, { c: '17. Psychiatry', t: 'Dissociative Disorders' }, { c: '17. Psychiatry', t: 'Somatic and Factitious Disorders' }, { c: '17. Psychiatry', t: 'Personality Disorders' }, { c: '17. Psychiatry', t: 'Mood Disorders' }, { c: '17. Psychiatry', t: 'Anxiety Disorders' }, { c: '17. Psychiatry', t: 'Eating Disorders' }, { c: '17. Psychiatry', t: 'Sleep Disorders' }, { c: '17. Psychiatry', t: 'Alcohol and CNS Depressants' }, { c: '17. Psychiatry', t: 'Opioids' }, { c: '17. Psychiatry', t: 'Stimulants' }, { c: '17. Psychiatry', t: 'Other Drugs' }, { c: '17. Psychiatry', t: 'Antidepressants' }, { c: '17. Psychiatry', t: 'Lithium' }, { c: '17. Psychiatry', t: 'Antipsychotics' },
+                { c: '18. Pulmonary', t: 'Pulmonary Embryology' }, { c: '18. Pulmonary', t: 'Pulmonary Anatomy' }, { c: '18. Pulmonary', t: 'Pulmonary Physiology' }, { c: '18. Pulmonary', t: 'Hemoglobin' }, { c: '18. Pulmonary', t: 'Pulmonary Circulation' }, { c: '18. Pulmonary', t: 'Hypoxia' }, { c: '18. Pulmonary', t: 'Ventilation and Perfusion' }, { c: '18. Pulmonary', t: 'Carbon Dioxide' }, { c: '18. Pulmonary', t: 'Pulmonary Physical Exam' }, { c: '18. Pulmonary', t: 'Pulmonary Function Tests' }, { c: '18. Pulmonary', t: 'Obstructive Lung Disease' }, { c: '18. Pulmonary', t: 'Restrictive Lung Disease' }, { c: '18. Pulmonary', t: 'Treatment of COPD and Asthma' }, { c: '18. Pulmonary', t: 'Pneumonia' }, { c: '18. Pulmonary', t: 'Pleural Disease' }, { c: '18. Pulmonary', t: 'Lung Cancer' }, { c: '18. Pulmonary', t: 'Sleep Apnea' }, { c: '18. Pulmonary', t: 'Cystic Fibrosis' }, { c: '18. Pulmonary', t: 'Tuberculosis' }, { c: '18. Pulmonary', t: 'Sarcoidosis' }, { c: '18. Pulmonary', t: 'Pulmonary Embolism' }, { c: '18. Pulmonary', t: 'Chest X-rays' },
+                { c: '19. Renal', t: 'Renal Embryology' }, { c: '19. Renal', t: 'Renal Anatomy' }, { c: '19. Renal', t: 'Renal Physiology I' }, { c: '19. Renal', t: 'Renal Physiology II' }, { c: '19. Renal', t: 'Nephron Physiology' }, { c: '19. Renal', t: 'Renal Endocrine Function' }, { c: '19. Renal', t: 'Acid Excretion' }, { c: '19. Renal', t: 'Acid-Base Principles' }, { c: '19. Renal', t: 'Respiratory Disorders' }, { c: '19. Renal', t: 'Metabolic Alkalosis' }, { c: '19. Renal', t: 'Renal Tubular Acidosis' }, { c: '19. Renal', t: 'Metabolic Acidosis' }, { c: '19. Renal', t: 'Acid Base Problems' }, { c: '19. Renal', t: 'Electrolyte Disorders' }, { c: '19. Renal', t: 'Sodium and Water Balance' }, { c: '19. Renal', t: 'Sodium Disorders' }, { c: '19. Renal', t: 'Glomerulonephritis Principles' }, { c: '19. Renal', t: 'Nephritic Syndrome' }, { c: '19. Renal', t: 'Nephrotic Syndrome' }, { c: '19. Renal', t: 'MPGN' }, { c: '19. Renal', t: 'Tubulointerstitial Disease' }, { c: '19. Renal', t: 'Renal Failure' }, { c: '19. Renal', t: 'Urinary Tract Infections' }, { c: '19. Renal', t: 'Cystic Kidney Disease' }, { c: '19. Renal', t: 'Diuretics' }, { c: '19. Renal', t: 'Kidney Stones' }, { c: '19. Renal', t: 'Renal and Bladder Tumors' }, { c: '19. Renal', t: 'Rhabdomyolysis' },
+                { c: '20. Reproductive', t: 'Embryonic Genes' }, { c: '20. Reproductive', t: 'Embryogenesis' }, { c: '20. Reproductive', t: 'Germ Layers' }, { c: '20. Reproductive', t: 'Errors in Morphogenesis' }, { c: '20. Reproductive', t: 'Teratogens I' }, { c: '20. Reproductive', t: 'Teratogens II' }, { c: '20. Reproductive', t: 'Pharyngeal Arches' }, { c: '20. Reproductive', t: 'Cleft Lip and Palate' }, { c: '20. Reproductive', t: 'Pharyngeal Pouches and Clefts' }, { c: '20. Reproductive', t: 'Genital Embryology' }, { c: '20. Reproductive', t: 'Spermatogenesis and Oogenesis' }, { c: '20. Reproductive', t: 'Placenta' }, { c: '20. Reproductive', t: 'Twins' }, { c: '20. Reproductive', t: 'Pregnancy' }, { c: '20. Reproductive', t: 'Maternal-Fetal Disorders' }, { c: '20. Reproductive', t: 'Hypertension in Pregnancy' }, { c: '20. Reproductive', t: 'Placental Complications' }, { c: '20. Reproductive', t: 'Gestational Tumors' }, { c: '20. Reproductive', t: 'TORCH Infections' }, { c: '20. Reproductive', t: 'Vaginal Cancer' }, { c: '20. Reproductive', t: 'Cervical Cancer' }, { c: '20. Reproductive', t: 'Endometrial Disorders' }, { c: '20. Reproductive', t: 'Endometriosis' }, { c: '20. Reproductive', t: 'Endometrial Cancer' }, { c: '20. Reproductive', t: 'Ovarian Cysts' }, { c: '20. Reproductive', t: 'Ovarian Epithelial Tumors' }, { c: '20. Reproductive', t: 'Ovarian Stromal Tumors' }, { c: '20. Reproductive', t: 'Ovarian Germ Cell Tumors' }, { c: '20. Reproductive', t: 'Breast Tissue' }, { c: '20. Reproductive', t: 'Breast Disorders' }, { c: '20. Reproductive', t: 'Breast Carcinoma' }, { c: '20. Reproductive', t: 'Penile Disorders' }, { c: '20. Reproductive', t: 'Scrotal Disorders' }, { c: '20. Reproductive', t: 'Testicular Cancer' }, { c: '20. Reproductive', t: 'Prostate' }, { c: '20. Reproductive', t: 'Disorders of Sexual Development' }, { c: '20. Reproductive', t: 'Hypogonadism' }
+            ];
             bnb_detailed.forEach(i => items.push({ id: uid(), title: i.t, source: 'BnB', cat: i.c, diff: 0, anki: false, done: false, date: null }));
-
-            // 2. First Aid (New Data)
             FA_RAW.forEach(row => {
-                // row[0] = "01 Biochem" -> clean to "Biochemistry"
                 let cleanCat = row[0].replace(/^\d+\s/, ''); 
-                // row[1] = "01 Molecular" -> clean to "Molecular"
                 let cleanSub = row[1].replace(/^\d+\s/, '');
-                
-                items.push({
-                    id: uid(),
-                    title: row[2], // Topic
-                    source: 'FA',
-                    cat: cleanCat, // Major Subject (Biochem)
-                    subcat: cleanSub, // Sub (Molecular) - stored for potential detailed filtering
-                    diff: 0, anki: false, done: false, date: null
-                });
+                items.push({ id: uid(), title: row[2], source: 'FA', cat: cleanCat, subcat: cleanSub, diff: 0, anki: false, done: false, date: null });
             });
-
-            // 3. Sketchy Placeholder
             ['Staph Aureus', 'Strep Pyogenes', 'E. Coli', 'Herpes', 'HIV', 'Malaria'].forEach(t => 
                 items.push({ id: uid(), title: t, source: 'Sketchy', cat: 'Micro', diff: 0, anki: false, done: false, date: null })
             );
-
             return items;
         };
 
-        // --- 2. CORE APPLICATION ---
         const app = {
             data: [],
-            state: { view: 'dashboard', month: 0, year: 2026 },
-
+            state: { view: 'dashboard', month: 1, year: 2026 },
             init: () => {
                 const stored = localStorage.getItem('usmle_tracker_v4');
-                if (stored) {
-                    app.data = JSON.parse(stored);
-                } else {
-                    app.data = generateSeedData();
-                    app.save();
-                }
+                if (stored) { app.data = JSON.parse(stored); } 
+                else { app.data = generateSeedData(); app.save(); }
                 app.navigate('dashboard');
                 app.updateGlobalStats();
             },
-
-            save: () => {
-                localStorage.setItem('usmle_tracker_v4', JSON.stringify(app.data));
-                app.updateGlobalStats();
-            },
-
+            save: () => { localStorage.setItem('usmle_tracker_v4', JSON.stringify(app.data)); app.updateGlobalStats(); },
             navigate: (viewId) => {
                 app.state.view = viewId;
-                document.querySelectorAll('.nav-item').forEach(el => {
-                    el.classList.remove('bg-slate-800', 'text-white', 'shadow-inner');
-                    el.classList.add('text-slate-300');
-                });
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-slate-800', 'text-white'));
                 const active = document.getElementById(`nav-${viewId}`);
-                if(active) {
-                    active.classList.add('bg-slate-800', 'text-white', 'shadow-inner');
-                    active.classList.remove('text-slate-300');
-                }
+                if(active) active.classList.add('bg-slate-800', 'text-white');
                 const viewport = document.getElementById('viewport');
-                viewport.innerHTML = ''; 
-                
+                viewport.innerHTML = '';
                 if (viewId === 'dashboard') app.views.dashboard(viewport);
                 else if (viewId === 'bnb_dashboard') app.views.bnb_dashboard(viewport);
                 else if (viewId === 'fa_dashboard') app.views.fa_dashboard(viewport);
                 else if (viewId === 'planner') app.views.planner(viewport);
-                else app.views.list(viewport, viewId);
+                else if (viewId === 'sketchy') app.views.list(viewport, 'sketchy');
             },
-
-            // --- 3. VIEW RENDERERS ---
             views: {
-                // MAIN HOME DASHBOARD
                 dashboard: (container) => {
                     document.getElementById('pageTitle').innerText = 'Ecosystem Dashboard';
                     container.className = 'p-8 overflow-y-auto custom-scroll fade-in h-full';
-
-                    const total = app.data.length;
-                    const done = app.data.filter(i => i.done).length;
-                    const bnbDone = app.data.filter(i => i.source === 'BnB' && i.done).length;
-                    const faDone = app.data.filter(i => i.source === 'FA' && i.done).length;
-
+                    const total = app.data.length, done = app.data.filter(i => i.done).length;
                     container.innerHTML = `
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Ecosystem</span>
+                                <span class="text-xs font-bold text-slate-400 uppercase">Total Ecosystem</span>
                                 <div class="text-4xl font-bold text-slate-800 mt-2">${Math.round(done/total*100) || 0}%</div>
-                                <div class="text-sm text-slate-500 mt-1">${done} / ${total} tasks</div>
-                            </div>
-                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">B&B Videos</span>
-                                <div class="text-4xl font-bold text-indigo-500 mt-2">${bnbDone}</div>
-                            </div>
-                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">First Aid Topics</span>
-                                <div class="text-4xl font-bold text-emerald-600 mt-2">${faDone}</div>
                             </div>
                         </div>
                         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <h3 class="font-bold text-slate-800 mb-6">Mastery Heatmap (Difficulty)</h3>
+                            <h3 class="font-bold text-slate-800 mb-6">Mastery Heatmap</h3>
                             <div class="chart-wrapper"><canvas id="chartDiff"></canvas></div>
-                        </div>
-                    `;
+                        </div>`;
                     setTimeout(() => app.charts.diff('chartDiff'), 50);
                 },
-
-                // B&B DASHBOARD
                 bnb_dashboard: (container) => {
-                    document.getElementById('pageTitle').innerText = 'Boards & Beyond Library';
-                    container.className = 'p-0 flex flex-col h-full bg-slate-50 fade-in';
-                    const items = app.data.filter(i => i.source === 'BnB');
-                    app.renderResourceDashboard(container, items, "Video Completion", "bg-indigo-500", "videos");
+                    document.getElementById('pageTitle').innerText = 'Boards & Beyond';
+                    container.className = 'flex flex-col h-full bg-slate-50 fade-in';
+                    app.renderResourceDashboard(container, app.data.filter(i => i.source === 'BnB'), "Video Completion", "bg-indigo-500", "videos");
                 },
-
-                // FIRST AID DASHBOARD (NEW)
                 fa_dashboard: (container) => {
-                    document.getElementById('pageTitle').innerText = 'First Aid Library';
-                    container.className = 'p-0 flex flex-col h-full bg-slate-50 fade-in';
-                    const items = app.data.filter(i => i.source === 'FA');
-                    app.renderResourceDashboard(container, items, "Syllabus Completion", "bg-emerald-500", "topics");
+                    document.getElementById('pageTitle').innerText = 'First Aid';
+                    container.className = 'flex flex-col h-full bg-slate-50 fade-in';
+                    app.renderResourceDashboard(container, app.data.filter(i => i.source === 'FA'), "Syllabus Completion", "bg-emerald-500", "topics");
                 },
-
-                // LIST VIEW (Sketchy)
                 list: (container, viewId) => {
-                    document.getElementById('pageTitle').innerText = viewId === 'sketchy' ? 'Sketchy Micro' : viewId;
+                    document.getElementById('pageTitle').innerText = 'Sketchy Micro';
                     container.className = 'p-8 overflow-y-auto custom-scroll fade-in h-full';
-                    const items = app.data.filter(i => i.source === 'Sketchy');
-                    app.renderSimpleList(container, items);
+                    app.renderSimpleList(container, app.data.filter(i => i.source === 'Sketchy'));
                 },
-
-                // PLANNER VIEW
                 planner: (container) => {
                     document.getElementById('pageTitle').innerText = '2026 Planner';
-                    container.className = 'flex flex-col h-full bg-slate-100 fade-in';
+                    container.className = 'flex h-full bg-slate-100 fade-in';
                     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                    
                     container.innerHTML = `
-                        <div class="flex h-full">
-                            <div class="w-80 bg-white border-r border-slate-200 flex flex-col z-10 shadow-lg">
-                                <div class="p-4 border-b bg-slate-50"><h3 class="font-bold text-slate-700 text-sm">Unscheduled Tasks</h3></div>
-                                <div class="flex-grow overflow-y-auto custom-scroll p-3 space-y-2" id="backlog-list"></div>
-                            </div>
-                            <div class="flex-grow flex flex-col">
-                                <div class="h-14 bg-white border-b flex items-center justify-between px-6">
-                                    <button onclick="app.actions.changeMonth(-1)" class="font-bold text-slate-500 hover:text-slate-800">←</button>
-                                    <h2 class="font-bold text-slate-800">${months[app.state.month]} ${app.state.year}</h2>
-                                    <button onclick="app.actions.changeMonth(1)" class="font-bold text-slate-500 hover:text-slate-800">→</button>
-                                </div>
-                                <div class="grid grid-cols-7 text-center py-2 bg-slate-50 border-b text-xs font-bold text-slate-400">
-                                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-                                </div>
-                                <div class="flex-grow overflow-y-auto custom-scroll"><div id="calendar-grid" class="grid grid-cols-7 min-h-full auto-rows-fr"></div></div>
-                            </div>
+                        <div class="w-80 bg-white border-r border-slate-200 flex flex-col z-10 shadow-lg">
+                            <div class="p-4 border-b bg-slate-50 font-bold text-slate-700 text-sm">Unscheduled</div>
+                            <div class="flex-grow overflow-y-auto custom-scroll p-3 space-y-2" id="backlog-list"></div>
                         </div>
-                    `;
-
-                    // Backlog
+                        <div class="flex-grow flex flex-col">
+                            <div class="h-14 bg-white border-b flex items-center justify-between px-6">
+                                <button onclick="app.actions.changeMonth(-1)" class="font-bold text-slate-500 hover:text-slate-800">←</button>
+                                <h2 class="font-bold text-slate-800">${months[app.state.month]} ${app.state.year}</h2>
+                                <button onclick="app.actions.changeMonth(1)" class="font-bold text-slate-500 hover:text-slate-800">→</button>
+                            </div>
+                            <div class="grid grid-cols-7 text-center py-2 bg-slate-50 border-b text-xs font-bold text-slate-400">
+                                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                            </div>
+                            <div class="flex-grow overflow-y-auto custom-scroll"><div id="calendar-grid" class="grid grid-cols-7 min-h-full auto-rows-fr"></div></div>
+                        </div>`;
                     const backlogEl = document.getElementById('backlog-list');
-                    const unscheduled = app.data.filter(i => !i.date && !i.done);
-                    backlogEl.innerHTML = unscheduled.map(item => `
-                        <div draggable="true" ondragstart="app.drag.start(event)" id="${item.id}"
-                             class="draggable-item bg-white border border-slate-200 p-2 rounded shadow-sm mb-2 border-l-4 diff-${item.diff}">
+                    backlogEl.innerHTML = app.data.filter(i => !i.date && !i.done).map(item => `
+                        <div draggable="true" ondragstart="app.drag.start(event)" id="${item.id}" class="draggable-item bg-white border border-slate-200 p-2 rounded shadow-sm border-l-4 diff-${item.diff}">
                             <div class="text-[9px] font-bold text-slate-400 uppercase">${item.source} • ${item.cat}</div>
                             <div class="text-xs font-bold text-slate-700 leading-tight">${item.title}</div>
-                        </div>
-                    `).join('');
-
-                    // Calendar
+                        </div>`).join('');
                     const gridEl = document.getElementById('calendar-grid');
-                    const firstDay = new Date(app.state.year, app.state.month, 1).getDay();
-                    const daysInMonth = new Date(app.state.year, app.state.month + 1, 0).getDate();
+                    const firstDay = new Date(app.state.year, app.state.month, 1).getDay(), daysInMonth = new Date(app.state.year, app.state.month + 1, 0).getDate();
                     let calHtml = '';
                     for(let i=0; i<firstDay; i++) calHtml += `<div class="bg-slate-50 border-b border-r border-slate-200"></div>`;
                     for(let d=1; d<=daysInMonth; d++) {
                         const dateStr = `${app.state.year}-${String(app.state.month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                        const tasks = app.data.filter(i => i.date === dateStr);
-                        calHtml += `
-                            <div class="droppable-day bg-white border-b border-r p-1 flex flex-col gap-1 relative group"
-                                 ondrop="app.drag.drop(event, '${dateStr}')" ondragover="app.drag.allow(event)">
-                                <span class="text-xs font-bold text-slate-400 ml-1">${d}</span>
-                                ${tasks.map(t => `
-                                    <div draggable="true" ondragstart="app.drag.start(event)" id="${t.id}"
-                                         class="bg-sky-50 border border-sky-200 p-1 rounded text-[10px] text-sky-900 font-medium cursor-grab flex justify-between group/item">
-                                        <span class="truncate">${t.title}</span>
-                                        <button onclick="app.actions.unschedule('${t.id}')" class="text-red-400 hidden group-hover/item:block">×</button>
-                                    </div>
-                                `).join('')}
-                            </div>`;
+                        calHtml += `<div class="droppable-day bg-white border-b border-r p-1 flex flex-col gap-1 relative group" ondrop="app.drag.drop(event, '${dateStr}')" ondragover="app.drag.allow(event)" ondragleave="app.drag.leave(event)">
+                            <span class="text-xs font-bold text-slate-400 ml-1">${d}</span>
+                            ${app.data.filter(i => i.date === dateStr).map(t => `<div draggable="true" ondragstart="app.drag.start(event)" id="${t.id}" class="bg-sky-50 border border-sky-200 p-1 rounded text-[10px] text-sky-900 font-medium cursor-grab flex justify-between group/item">
+                                <span class="truncate">${t.title}</span><button onclick="app.actions.unschedule('${t.id}')" class="text-red-400 hidden group-hover/item:block">×</button>
+                            </div>`).join('')}</div>`;
                     }
                     gridEl.innerHTML = calHtml;
                 }
             },
-
-            // --- 4. RENDER HELPERS ---
             renderResourceDashboard: (container, items, label, colorClass, itemLabel) => {
-                const total = items.length;
-                const done = items.filter(i => i.done).length;
-                const anki = items.filter(i => i.anki).length;
-                
-                const moduleStats = {};
-                items.forEach(i => {
-                    if (!moduleStats[i.cat]) moduleStats[i.cat] = { total: 0, done: 0 };
-                    moduleStats[i.cat].total++;
-                    if (i.done) moduleStats[i.cat].done++;
-                });
-
-                container.innerHTML = `
-                    <div class="bg-white border-b border-slate-200 p-8 shadow-sm z-10">
-                        <div class="flex flex-col md:flex-row justify-between items-center gap-6 max-w-6xl mx-auto">
-                            <div class="flex-1 w-full">
-                                <h3 class="text-sm font-bold text-slate-400 uppercase mb-2">${label}</h3>
-                                <div class="flex items-end gap-2">
-                                    <span class="text-4xl font-bold text-slate-800">${done}</span>
-                                    <span class="text-lg text-slate-400 mb-1">/ ${total}</span>
-                                </div>
-                                <div class="w-full bg-slate-100 rounded-full h-2 mt-3">
-                                    <div class="${colorClass} h-2 rounded-full" style="width: ${(done/total)*100}%"></div>
-                                </div>
-                            </div>
-                            <div class="flex-1 w-full">
-                                    <h3 class="text-sm font-bold text-slate-400 uppercase mb-2">Anki Integration</h3>
-                                    <div class="flex items-end gap-2">
-                                    <span class="text-4xl font-bold text-sky-600">${anki}</span>
-                                    <span class="text-sm text-slate-400 mb-2">cards finished</span>
-                                </div>
-                                <div class="w-full bg-slate-100 rounded-full h-2 mt-3">
-                                    <div class="bg-sky-500 h-2 rounded-full" style="width: ${(anki/total)*100}%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex-grow overflow-y-auto custom-scroll p-8">
-                        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            <div class="space-y-4">
-                                <h4 class="font-bold text-slate-700">Module Progress</h4>
-                                ${Object.keys(moduleStats).sort().map(mod => {
-                                    const stat = moduleStats[mod];
-                                    const pct = Math.round((stat.done/stat.total)*100);
-                                    return `
-                                        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
-                                            <div class="flex justify-between text-xs font-bold text-slate-600 mb-2">
-                                                <span class="truncate pr-2" title="${mod}">${mod}</span>
-                                                <span>${pct}%</span>
-                                            </div>
-                                            <div class="w-full bg-slate-100 rounded-full h-1.5">
-                                                <div class="${colorClass} h-1.5 rounded-full" style="width: ${pct}%"></div>
-                                            </div>
-                                        </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                            <div class="lg:col-span-2 space-y-6">
-                                <h4 class="font-bold text-slate-700">Topic Inventory</h4>
-                                ${Object.keys(moduleStats).sort().map(mod => {
-                                    const modItems = items.filter(i => i.cat === mod);
-                                    return `
-                                        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-                                            <div class="bg-slate-50 px-5 py-3 border-b border-slate-100 flex justify-between items-center sticky top-0">
-                                                <h5 class="font-bold text-slate-700 text-sm">${mod}</h5>
-                                                <span class="text-xs bg-white border border-slate-200 px-2 py-1 rounded text-slate-500">${modItems.length} ${itemLabel}</span>
-                                            </div>
-                                            <div class="divide-y divide-slate-100">
-                                                ${modItems.map(item => `
-                                                    <div class="px-5 py-3 flex items-center justify-between hover:bg-slate-50 transition-colors group">
-                                                        <div class="flex items-center gap-3">
-                                                            <input type="checkbox" onchange="app.actions.toggleDone('${item.id}')" ${item.done ? 'checked' : ''} class="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
-                                                            <div>
-                                                                <div class="text-sm font-medium text-slate-700 ${item.done ? 'line-through opacity-50' : ''}">${item.title}</div>
-                                                                ${item.subcat ? `<div class="text-[10px] text-slate-400">${item.subcat}</div>` : ''}
-                                                            </div>
-                                                        </div>
-                                                        <div class="flex items-center gap-3 opacity-60 group-hover:opacity-100 transition-opacity">
-                                                            <div class="relative group/diff">
-                                                                <button class="w-4 h-4 rounded-full border diff-${item.diff}"></button>
-                                                                <div class="absolute right-0 top-6 bg-white border p-1 rounded shadow-lg hidden group-hover/diff:flex gap-1 z-50">
-                                                                    ${[1,2,3,4,5,6].map(l => `<button onclick="app.actions.setDiff('${item.id}', ${l})" class="w-4 h-4 rounded-full diff-${l} hover:scale-110"></button>`).join('')}
-                                                                </div>
-                                                            </div>
-                                                            <button onclick="app.actions.toggleAnki('${item.id}')" class="text-[10px] px-2 py-0.5 rounded border ${item.anki ? 'bg-sky-100 text-sky-700 border-sky-200' : 'bg-white text-slate-400 border-slate-200'}">
-                                                                ${item.anki ? 'Anki Done' : 'Anki'}
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                `).join('')}
-                                            </div>
-                                        </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                        </div>
-                    </div>
-                `;
+                const total = items.length, done = items.filter(i => i.done).length, anki = items.filter(i => i.anki).length;
+                const moduleStats = {}; items.forEach(i => { if (!moduleStats[i.cat]) moduleStats[i.cat] = { total: 0, done: 0 }; moduleStats[i.cat].total++; if (i.done) moduleStats[i.cat].done++; });
+                container.innerHTML = `<div class="bg-white border-b p-8 shadow-sm"><div class="flex flex-col md:flex-row justify-between gap-6 max-w-6xl mx-auto"><div class="flex-1">
+                    <h3 class="text-sm font-bold text-slate-400 uppercase mb-2">${label}</h3><div class="text-4xl font-bold">${done} <span class="text-lg text-slate-400">/ ${total}</span></div>
+                    <div class="w-full bg-slate-100 rounded-full h-2 mt-3"><div class="${colorClass} h-2 rounded-full" style="width: ${(done/total)*100}%"></div></div></div>
+                    <div class="flex-1"><h3 class="text-sm font-bold text-slate-400 uppercase mb-2">Anki Integration</h3><div class="text-4xl font-bold text-sky-600">${anki}</div>
+                    <div class="w-full bg-slate-100 rounded-full h-2 mt-3"><div class="bg-sky-500 h-2 rounded-full" style="width: ${(anki/total)*100}%"></div></div></div></div></div>
+                    <div class="flex-grow overflow-y-auto custom-scroll p-8"><div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="space-y-4">
+                    ${Object.keys(moduleStats).sort().map(mod => `<div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm"><div class="flex justify-between text-xs font-bold text-slate-600 mb-2"><span>${mod}</span><span>${Math.round((moduleStats[mod].done/moduleStats[mod].total)*100)}%</span></div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5"><div class="${colorClass} h-1.5 rounded-full" style="width: ${(moduleStats[mod].done/moduleStats[mod].total)*100}%"></div></div></div>`).join('')}</div>
+                    <div class="lg:col-span-2 space-y-6">${Object.keys(moduleStats).sort().map(mod => `<div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm"><div class="bg-slate-50 px-5 py-3 border-b border-slate-100 flex justify-between items-center sticky top-0"><h5 class="font-bold text-slate-700 text-sm">${mod}</h5><span class="text-xs border px-2 py-1 rounded text-slate-500">${moduleStats[mod].total} ${itemLabel}</span></div>
+                    <div class="divide-y divide-slate-100">${items.filter(i => i.cat === mod).map(item => `<div class="px-5 py-3 flex items-center justify-between hover:bg-slate-50 transition-colors group"><div class="flex items-center gap-3"><input type="checkbox" onchange="app.actions.toggleDone('${item.id}')" ${item.done ? 'checked' : ''} class="w-4 h-4 cursor-pointer">
+                    <div><div class="text-sm font-medium text-slate-700 ${item.done ? 'line-through opacity-50' : ''}">${item.title}</div>${item.subcat ? `<div class="text-[10px] text-slate-400">${item.subcat}</div>` : ''}</div></div><div class="flex items-center gap-3"><div class="relative group/diff"><button class="w-4 h-4 rounded-full border diff-${item.diff}"></button><div class="absolute right-0 top-6 bg-white border p-1 rounded shadow-lg hidden group-hover/diff:flex gap-1 z-50">
+                    ${[1,2,3,4,5,6].map(l => `<button onclick="app.actions.setDiff('${item.id}', ${l})" class="w-4 h-4 rounded-full diff-${l} hover:scale-110"></button>`).join('')}</div></div><button onclick="app.actions.toggleAnki('${item.id}')" class="text-[10px] px-2 py-0.5 rounded border ${item.anki ? 'bg-sky-100 text-sky-700' : 'text-slate-400'}">${item.anki ? 'Anki Done' : 'Anki'}</button></div></div>`).join('')}</div></div>`).join('')}</div></div></div>`;
             },
-            
             renderSimpleList: (container, items) => {
                 let html = `<div class="max-w-4xl mx-auto space-y-4">`;
                 const cats = {}; items.forEach(i => { if(!cats[i.cat]) cats[i.cat]=[]; cats[i.cat].push(i); });
-                Object.keys(cats).forEach(cat => {
-                    html += `<div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden"><div class="bg-slate-50 px-4 py-2 font-bold text-sm text-slate-700 border-b border-slate-100">${cat}</div><div class="divide-y divide-slate-100">${cats[cat].map(item => `<div class="px-4 py-3 flex justify-between hover:bg-slate-50"><div class="flex gap-3"><input type="checkbox" onchange="app.actions.toggleDone('${item.id}')" ${item.done ? 'checked' : ''}><span class="text-sm ${item.done?'line-through opacity-50':''}">${item.title}</span></div></div>`).join('')}</div></div>`;
-                });
-                html += `</div>`;
-                container.innerHTML = html;
+                Object.keys(cats).forEach(cat => { html += `<div class="bg-white rounded-lg border border-slate-200 overflow-hidden"><div class="bg-slate-50 px-4 py-2 font-bold text-sm border-b">${cat}</div><div class="divide-y">${cats[cat].map(item => `<div class="px-4 py-3 flex gap-3"><input type="checkbox" onchange="app.actions.toggleDone('${item.id}')" ${item.done ? 'checked' : ''}><span class="text-sm ${item.done?'line-through opacity-50':''}">${item.title}</span></div>`).join('')}</div></div>`; });
+                container.innerHTML = html + `</div>`;
             },
-
-            // --- 5. ACTIONS & CHARTS ---
             actions: {
                 toggleDone: (id) => { const i = app.data.find(x=>x.id===id); if(i) { i.done=!i.done; app.save(); app.navigate(app.state.view); } },
                 toggleAnki: (id) => { const i = app.data.find(x=>x.id===id); if(i) { i.anki=!i.anki; app.save(); app.navigate(app.state.view); } },
                 setDiff: (id, lvl) => { const i = app.data.find(x=>x.id===id); if(i) { i.diff=lvl; app.save(); app.navigate(app.state.view); } },
                 changeMonth: (d) => { app.state.month+=d; if(app.state.month>11){app.state.month=0;app.state.year++} if(app.state.month<0){app.state.month=11;app.state.year--} app.navigate('planner'); },
-                unschedule: (id) => { const i = app.data.find(x=>x.id===id); if(i){i.date=null;app.save();app.navigate('planner')} }
+                unschedule: (id) => { const i = app.data.find(x=>x.id===id); if(i){i.date=null;app.save();app.navigate('planner')} },
+                hardReset: () => { if(confirm("Reset all progress?")) { localStorage.removeItem('usmle_tracker_v4'); app.init(); } }
             },
             drag: {
                 start: (ev) => { ev.dataTransfer.setData("text", ev.target.id); },
                 allow: (ev) => { ev.preventDefault(); ev.currentTarget.classList.add('drag-over'); },
-                drop: (ev, date) => { ev.preventDefault(); const id=ev.dataTransfer.getData("text"); const i=app.data.find(x=>x.id===id); if(i){i.date=date;app.save();app.navigate('planner')} }
+                leave: (ev) => { ev.currentTarget.classList.remove('drag-over'); },
+                drop: (ev, date) => { ev.preventDefault(); ev.currentTarget.classList.remove('drag-over'); const id=ev.dataTransfer.getData("text"); const i=app.data.find(x=>x.id===id); if(i){i.date=date;app.save();app.navigate('planner')} }
             },
             charts: {
                 diff: (id) => {
                     const diffCounts = [0,0,0,0,0,0,0]; app.data.forEach(i => diffCounts[i.diff]++);
-                    new Chart(document.getElementById(id), {
-                        type: 'bar',
-                        data: {
-                            labels: ['Unrated', 'V.Easy', 'Easy', 'Good', 'Medium', 'Hard', 'V.Hard'],
-                            datasets: [{ label: 'Topics', data: diffCounts, backgroundColor: ['#e2e8f0', '#15803d', '#4ade80', '#facc15', '#fb923c', '#ef4444', '#7f1d1d'], borderRadius: 4 }]
-                        },
-                        options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
-                    });
+                    new Chart(document.getElementById(id), { type: 'bar', data: { labels: ['Unrated', 'V.Easy', 'Easy', 'Good', 'Medium', 'Hard', 'V.Hard'], datasets: [{ label: 'Topics', data: diffCounts, backgroundColor: ['#e2e8f0', '#15803d', '#4ade80', '#facc15', '#fb923c', '#ef4444', '#7f1d1d'], borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
                 }
             },
             updateGlobalStats: () => {
-                const done = app.data.filter(i=>i.done).length; const total = app.data.length;
-                const pct = total===0?0:Math.round((done/total)*100);
-                document.getElementById('totalProgress').innerText = pct;
-                document.getElementById('progressBar').style.width = pct+'%';
+                const done = app.data.filter(i=>i.done).length, total = app.data.length, pct = total===0?0:Math.round((done/total)*100);
+                document.getElementById('totalProgress').innerText = pct; document.getElementById('progressBar').style.width = pct+'%';
             },
             exportData: () => { const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(app.data)); const n = document.createElement('a'); n.href = str; n.download = 'backup.json'; n.click(); },
             importData: (input) => { const f = input.files[0]; if(!f) return; const r = new FileReader(); r.onload=(e)=>{ app.data=JSON.parse(e.target.result); app.save(); app.init(); }; r.readAsText(f); }
         };
-
         document.addEventListener('DOMContentLoaded', app.init);
     </script>
 </body>
